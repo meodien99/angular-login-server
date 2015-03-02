@@ -18,7 +18,7 @@ var job = new CronJob({
     start: false,
     timeZone : 'Asia/Saigon'
 });
-job.start();
+//job.start();
 require('./app/setups/server')(app);
 require('./app/setups/routers')(app);
 
