@@ -162,22 +162,26 @@ var statistic = function(){
         var to = req.query.to;
 
 
+
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
+        console.log("FromTime:  " + from);
+        console.log("ToTime: " + to);
 
 
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = "";
+            var query = "SELECT xgame_task.name, COUNT(*) as amount FROM xgame_task INNER JOIN xgame_task_user ON xgame_task.id = xgame_task_user.xgame_task_id WHERE (xgame_task_user.task_received_time BETWEEN \""+ from +"\" AND \""+ to +"\")  group by xgame_task_user.xgame_task_id";
 
-            connection.query(query, function(err, games){
-                if(err)
+            connection.query(query, function(err, tasks){
+                if(err){
                     return F.responseJson(res, err, {});
-
-                return F.responseJson(res, null, games, STATUS.OK);
+                }
+                //console.log("chay ngon " + tasks[0].toString());
+                return F.responseJson(res, null, tasks, STATUS.OK);
             });
         });
     };
