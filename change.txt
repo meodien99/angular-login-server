@@ -1,0 +1,7 @@
+Create table `xgamedb`.`ccu_log`(
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `platform` varchar(255),
+  `date` datetime,
+  `ccu` int(11),
+  primary key (`id`)
+) ENGINE=InnoDB charset=utf8
