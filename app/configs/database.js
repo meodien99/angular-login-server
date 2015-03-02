@@ -14,11 +14,18 @@ module.exports = {
         password: 'mysqlCnC@anlon.com',
         database: 'xgamedb'
     }*/
-    'mysql' : {
+    /*'mysql' : {
         host: '123.30.189.189',
         port: 7462,
         user: 'admintool',
         password: 'admintool@2211',
+        database: 'xgamedb'
+    }*/
+    'mysql' : {
+        host: '123.30.189.189',
+        port: 7462,
+        user: 'root',
+        password: 'mysqlanlon.com.vn',
         database: 'xgamedb'
     }
 };

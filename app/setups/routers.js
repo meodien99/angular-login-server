@@ -18,7 +18,7 @@ var routers = function(app){
         if(typeof bearerHeader !== 'undefined'){
             var bearer = bearerHeader.split(" ");
             bearerToken = bearer[1];
-            console.log(bearerToken);
+            //console.log(bearerToken);
             req.token = bearerToken;
             next();
         } else {
