@@ -166,15 +166,12 @@ var statistic = function(){
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
-        console.log("FromTime:  " + from);
-        console.log("ToTime: " + to);
-
 
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = "SELECT xgame_task.name, COUNT(*) as amount FROM xgame_task INNER JOIN xgame_task_user ON xgame_task.id = xgame_task_user.xgame_task_id WHERE (xgame_task_user.task_received_time BETWEEN \""+ from +"\" AND \""+ to +"\")  group by xgame_task_user.xgame_task_id";
+            var query = "SELECT xgame_task.name, COUNT(*) as amount FROM xgame_task INNER JOIN xgame_task_user ON xgame_task.id = xgame_task_user.xgame_task_id WHERE (xgame_task_user.completed_time BETWEEN \""+ from +"\" AND \""+ to +"\")  group by xgame_task_user.xgame_task_id";
 
             connection.query(query, function(err, tasks){
                 if(err){
