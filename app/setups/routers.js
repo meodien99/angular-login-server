@@ -7,7 +7,8 @@ var routers = function(app){
     var statistic = require('../controllers/statistic'),
         users = require('../controllers/user'),
         authen = require('../controllers/authen'),
-        messages = require('../controllers/message');
+        messages = require('../controllers/message'),
+        pci = require('../controllers/pci');
    /* app.get('/yolo', IsAuthenticated, function(req, res, next){
         console.log(req.user);
         res.json({ok:200});
@@ -26,6 +27,7 @@ var routers = function(app){
         }
     }
 
+    app.use('/api', pci);
     app.use('/', authen);
     app.use('/users', ensureAuthorized, users);
     app.use('/', ensureAuthorized, statistic);

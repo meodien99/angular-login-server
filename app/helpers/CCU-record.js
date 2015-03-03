@@ -12,11 +12,6 @@ var Record = function(){
     var self = this;
 
     self.write = function(){
-
-
-        var data = [
-
-        ];
         var selectCCU = "SELECT id,USER_NAME,IS_ONLINE,last_login_time,current_xclient_type,REGISTERED_DATE FROM xuser WHERE is_online=(1) and is_ai=(0)";
         connection.query(selectCCU, function(err, rows, fields){
             if(err)
