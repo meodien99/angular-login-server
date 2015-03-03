@@ -6,6 +6,7 @@ var routers = function(app){
 
     var statistic = require('../controllers/statistic'),
         users = require('../controllers/user'),
+        payment = require('../controllers/payment'),
         authen = require('../controllers/authen'),
         messages = require('../controllers/message');
    /* app.get('/yolo', IsAuthenticated, function(req, res, next){
@@ -30,6 +31,7 @@ var routers = function(app){
     app.use('/users', ensureAuthorized, users);
     app.use('/', ensureAuthorized, statistic);
     app.use('/', ensureAuthorized, messages);
+    app.use('/payment', ensureAuthorized, payment);
 
     // catch 404 and forward to error handler
     app.use(function(req, res, next) {

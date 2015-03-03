@@ -165,10 +165,6 @@ var statistic = function(){
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
-<<<<<<< HEAD
-=======
-
->>>>>>> 3c24f487eab2d3d36251bd70e1a5fc61ba7b15ea
 
         req.getConnection(function(err, connection){
             if(err)
