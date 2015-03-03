@@ -27,10 +27,15 @@ var routers = function(app){
         }
     }
 
-    app.use('/api', pci);
+    //# api/app/*
+    app.use('/', pci);
+    //# /login
     app.use('/', authen);
+    //# /users
     app.use('/users', ensureAuthorized, users);
+    //# /*statistic
     app.use('/', ensureAuthorized, statistic);
+    //# /message/*
     app.use('/', ensureAuthorized, messages);
 
     // catch 404 and forward to error handler
