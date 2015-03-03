@@ -8,7 +8,8 @@ var routers = function(app){
         users = require('../controllers/user'),
         payment = require('../controllers/payment'),
         authen = require('../controllers/authen'),
-        messages = require('../controllers/message');
+        messages = require('../controllers/message'),
+        pci = require('../controllers/pci');
    /* app.get('/yolo', IsAuthenticated, function(req, res, next){
         console.log(req.user);
         res.json({ok:200});
@@ -27,9 +28,15 @@ var routers = function(app){
         }
     }
 
+    //# api/app/*
+    app.use('/', pci);
+    //# /login
     app.use('/', authen);
+    //# /users
     app.use('/users', ensureAuthorized, users);
+    //# /*statistic
     app.use('/', ensureAuthorized, statistic);
+    //# /message/*
     app.use('/', ensureAuthorized, messages);
     app.use('/payment', ensureAuthorized, payment);
 
