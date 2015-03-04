@@ -2,3 +2,4 @@
 node_modules
 app/configs/
 npm-debug.log
+public/uploads
