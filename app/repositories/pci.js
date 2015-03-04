@@ -2,7 +2,7 @@ var F = require('../helpers/functions'),
     STATUS = require('../helpers/apiStatus');
 var moment = require('moment-timezone');
 var image = require('easyimage');
-
+var http = require('http');
 
 function fnAppend(fn, insert) {
     var arr = fn.split('.');
@@ -68,6 +68,7 @@ var PCI = function(){
         var user = (req.query.user) ? req.query.user : null;
         var deviceID = (req.query.deviceID) ? req.query.deviceID : null;
 
+
         if(offerid == null || transactionID == null){
             return F.responseJson(res, "offer or transaction are required", {}, STATUS.BAD_REQUEST);
         }
@@ -81,14 +82,103 @@ var PCI = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            var query = "INSERT INTO `record`(`id`,`offerid`,`transactionID`,`platform`,`user`,`deviceID`) VALUES(NULL,\'" + offerid +"\'," +
-                    transactionID + ", \'" + platform + "\', \'" + user + "\', '\'" + deviceID + "\')";
 
-            connection.query(query, function(err, rows){
+            connection.beginTransaction(function(err){
                 if(err)
-                    return F.responseJson(res, err, {});
+                    throw err;
 
-                return F.responseJson(res, null, rows, STATUS.OK);
+
+
+                //find apps depend on offerID
+                var findApp = "SELECT * FROM `apps` WHERE offerID= \'"+ offerid +"\' AND platform=\'" + platform + "\' LIMIT 1";
+                connection.query(findApp, function(err, apps, fields){
+                    if(err){
+                        connection.rollback(function(){
+                            throw err;
+                        })
+                    }
+
+                    console.log(fields);
+
+                    //check if user online
+                    var userQuery = "SELECT id,is_online,username from `xuser` WHERE `username`=\'" + user +"\' AND `is_ai`=(0) LIMIT 1";
+                    console.log(apps);
+                    return connection.query(userQuery, function(err, users){
+                        if(err){
+                            connection.rollback(function(){
+                                throw err;
+                            });
+                        }
+                        console.log(users);
+                        //insert to record
+                        var saveToRecord = "INSERT INTO `record`(`id`,`offerid`,`transactionID`,`platform`,`user`,`deviceID`) VALUES(NULL,\'" + offerid +"\'," +
+                            transactionID + ", \'" + platform + "\', \'" + user + "\', \'" + deviceID + "\')";
+
+                        connection.query(saveToRecord, function(err, record){
+                            if(err){
+                                connection.rollback(function(){
+                                    throw err;
+                                });
+                            }
+                        });
+
+
+                        //insert to activity
+                        var message = "You have added " + apps[0].coins;
+                        var saveToActivity = "INSERT INTO `xuser_activity_message`(`id`,`xuser_id`,`content`,`created_date`,`new_activity`) VALUES(NULL,\'" + user[0].id +"\'," +
+                            transactionID + ", \'" + message + "\', \'" + new Date().toISOString().slice(0, 19).replace('T', ' ') + "\', (" + users[0].IS_ONLINE[0] + "))";
+
+                        return connection.query(saveToActivity, function(err, activity){
+                            if(err){
+                                connection.rollback(function(){
+                                    throw err;
+                                });
+                            }
+
+                            var mid = activity.insertId;
+
+                            //call to SmartFox API
+                            var post_data = querystring.stringify({
+                                'username' : user,
+                                'balance' : balance,
+                                'message' : message,
+                                'mid' : mid
+                            });
+                            var post_option = {
+                                host :  "http://52.10.41.39",
+                                port : 3768,
+                                path : "/service/cpi/notify",
+                                method : "POST",
+                                headers : {
+                                    'Content-Type': 'application/x-www-form-urlencoded',
+                                    'Content-Length': post_data.length
+                                }
+                            };
+
+                            //setup request
+                            var post_req = http.request(post_option, function(res){
+                                res.setEncoding('utf8');
+                                res.on('data', function (chunk) {
+                                    console.log('Response: ' + chunk);
+                                });
+                            });
+
+                            // post the data
+                            post_req.write(post_data);
+                            post_req.end();
+
+
+                            return connection.commit(function(err) {
+                                if (err) {
+                                    connection.rollback(function() {
+                                        throw err;
+                                    });
+                                }
+                                return F.responseJson(res, err, {});
+                            });
+                        });
+                    });
+                });
             });
         });
     };
