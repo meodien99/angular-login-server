@@ -1,6 +1,16 @@
 var F = require('../helpers/functions'),
     STATUS = require('../helpers/apiStatus');
 var moment = require('moment-timezone');
+var image = require('easyimage');
+
+
+function fnAppend(fn, insert) {
+    var arr = fn.split('.');
+    var ext = arr.pop();
+    insert = (insert !== undefined) ? insert : new Date().getTime();
+    return arr + '.' + insert + '.' + ext;
+}
+
 
 var PCI = function(){
     "use strict";
@@ -52,7 +62,35 @@ var PCI = function(){
 
     //notified when success
     self.getSaveToRecord = function(req, res, next){
-        //update later
+        var offerid = (req.query.offerID) ? req.query.offerID : null;
+        var transactionID = (req.query.transactionID) ? req.query.transactionID : null;
+        var platform = (req.query.platform) ? req.query.platform : null;
+        var user = (req.query.user) ? req.query.user : null;
+        var deviceID = (req.query.deviceID) ? req.query.deviceID : null;
+
+        if(offerid == null || transactionID == null){
+            return F.responseJson(res, "offer or transaction are required", {}, STATUS.BAD_REQUEST);
+        }
+        if(platform === null){
+            return F.responseJson(res, "PlatForm is empty", {}, STATUS.BAD_REQUEST);
+        }
+
+        if(deviceID === null || user === null){
+            return F.responseJson(res, "User or device are required", {}, STATUS.BAD_REQUEST);
+        }
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+            var query = "INSERT INTO `record`(`id`,`offerid`,`transactionID`,`platform`,`user`,`deviceID`) VALUES(NULL,\'" + offerid +"\'," +
+                    transactionID + ", \'" + platform + "\', \'" + user + "\', '\'" + deviceID + "\')";
+
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null, rows, STATUS.OK);
+            });
+        });
     };
 
     //all
@@ -103,18 +141,37 @@ var PCI = function(){
             var platform = (req.body.platform == null) ? null : req.body.platform;
             var coins = (req.body.coins == null) ? null : req.body.coins;
 
-
             if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null  )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
-            var query = "INSERT INTO `apps` (`id`, `name`, `image`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`) VALUES (NULL, \'"+ name +"\', NULL, \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
-                + platform + "\', \'" + offerID + "\', \'" + coins + "\')";
+            var file = req.files.icon;
+            if(file == null){
+                return F.responseJson(res, "Icon Image is required !", {}, STATUS.BAD_REQUEST);
+            }
 
-            connection.query(query, function(err, rows){
+            var type = file.mimetype;
+            if(type !== 'image/png' && type !== 'image/jpeg' && type !== 'image/gif' && type !== 'image/jpg'){
+                return F.responseJson(res, "Icon must be image type !", {}, STATUS.BAD_REQUEST);
+            }
+
+            image.resize({
+                src : file.path,
+                dst : fnAppend(file.path,'thumb'),
+                width : 100,
+                height : 100
+            }, function(err ,image, error){
                 if(err)
                     return F.responseJson(res, err, {});
+                var icon = '/public/uploades/' + fnAppend(file.name, 'thumb');
+                var query = "INSERT INTO `apps` (`id`, `name`, `icon`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`) VALUES (NULL, \'"+ name +"\', \'" + icon + "\', \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
+                    + platform + "\', \'" + offerID + "\', \'" + coins + "\')";
 
-                return F.responseJson(res, null, rows, STATUS.CREATED);
+                connection.query(query, function(err, rows){
+                    if(err)
+                        return F.responseJson(res, err, {});
+
+                    return F.responseJson(res, null, rows, STATUS.CREATED);
+                });
             });
         });
     };
@@ -137,9 +194,33 @@ var PCI = function(){
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
             var query = "UPDATE `apps` SET `name`=\'"+ name +"\', `description`=\'"+ description +"\', `eDate`=\'"+ eDate +"\', `sDate`=\'"+ sDate +"\', `offerID`=\'" + offerID + "\', `platform`=\'"
-                + platform +"\', `coins`=\'" + coins + "\' WHERE `id`=\'"+ req.params.id +"\'";
+                + platform +"\', `coins`=\'" + coins + "\'";
 
+            var file = req.files.icon;
+            if(file){
 
+                var type = file.mimetype;
+                if(type !== 'image/png' && type !== 'image/jpeg' && type !== 'image/gif' && type !== 'image/jpg'){
+                    return F.responseJson(res, "Icon must be image type !", {}, STATUS.BAD_REQUEST);
+                }
+                image.resize({
+                    src : file.path,
+                    dst : fnAppend(file.path,'thumb'),
+                    width : 100,
+                    height : 100
+                }, function(err ,image, error){
+                    if(err)
+                        return F.responseJson(res, err, {});
+                });
+                var icon = '/public/uploades/' + fnAppend(file.name, 'thumb');
+                query += ", `icon`=\'" + icon + "\' WHERE `id`=\'"+ req.params.id +"\'";
+            } else {
+                console.log(2);
+
+                query += " WHERE `id`=\'"+ req.params.id +"\'";
+            }
+
+            console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
