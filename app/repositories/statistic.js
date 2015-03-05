@@ -109,6 +109,29 @@ var statistic = function(){
             });
         });
     };
+    self.activeUserByTime = function(req, res, next){
+        var from = req.query.from;
+        var to = req.query.to;
+        if(from == null || to == null){
+            return F.responseJson(res, "Amount or Type must be filled.", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var selectQuery = "SELECT u.USER_NAME, u.REGISTERED_DATE, u.last_login_time, u.current_xclient_type, u.FACEBOOK_ID, u.xcoin FROM xuser u  WHERE (u.last_login_time BETWEEN \""+ from +"\" AND \""+ to +"\");";
+
+            connection.query(selectQuery, function(err, rows){
+                if(err){
+                    console.log(err);
+                    return F.responseJson(res, err, {});
+                }
+                console.log("Total Active User: " + rows.data);
+                return F.responseJson(res, null, rows, STATUS.OK);
+            });
+        });
+    };
 
     self.totalGamePlayedByTime = function(req, res, next){
         var time = req.query.amount;

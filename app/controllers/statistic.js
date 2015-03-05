@@ -9,6 +9,7 @@ router
     .get('/nubt', statisticRepo.newUserByTime.bind(statisticRepo))
     .get('/upbr', statisticRepo.playedUserByRange.bind(statisticRepo))
     .get('/upbt', statisticRepo.playedUserByTime.bind(statisticRepo))
+    .get('/activeUserbt', statisticRepo.activeUserByTime.bind(statisticRepo))
     .get('/gbt', statisticRepo.totalGamePlayedByTime.bind(statisticRepo))
     .get('/gbr', statisticRepo.totalGamePlayedByRange.bind(statisticRepo))
     .get('/gtbt', statisticRepo.getTaskByTime.bind(statisticRepo));
