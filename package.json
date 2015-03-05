@@ -26,6 +26,7 @@
     "mysql": "^2.5.4",
     "node-mysql": "^0.4.2",
     "passport": "^0.2.1",
+    "query-string": "^1.0.0",
     "serve-favicon": "~2.2.0"
   }
 }
