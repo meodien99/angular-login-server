@@ -15,32 +15,17 @@ var server = function(app){
     var connection = require('express-myconnection');
     var bcrypt = require('bcrypt-nodejs');
     var jwt = require('jsonwebtoken');
-
+    var multer = require('multer');
+    var multer_path = require('../configs/multer_path');
     process.env['JWT_SECRET'] = 'JWTSECRETKEY';
 
     //setup mysql driven
     app.use(
         connection(mysql, mysqlConfig,'request')
     );
-   /* app.use(function(req, res, next){
-        req.getConnection(function(err, connection){
-            if(err){
-                console.log("E : " + err);
-            }
 
-            connection.query('select * from xadmin where firstname=\'Asdmin\' limit 1', function(err, rows){
-                if(err){
-                    console.log("E2 : " + err);
-                } else {
-                    if(rows.length < 1){
-                        express.request.user = {test:'name',age:21};
-                    }
-                }
-
-                next();
-            });
-        })
-    });*/
+    //form-multipart
+    app.use(multer(multer_path.pci));
 
     // view engine setup
     app.set('views', path.join(__dirname, '../../views'));
@@ -68,10 +53,7 @@ var server = function(app){
 
     //cors
     app.use(cors());
-    /*app.get('/yolo1', function(req, res, next){
-        req.session.email = {test:'name',age:21};
-        res.json({ok:200});
-    });*/
+
 
 };
 
