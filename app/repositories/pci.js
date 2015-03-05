@@ -269,10 +269,12 @@ var PCI = function(){
             var platform = (req.body.platform == null) ? null : req.body.platform;
             var coins = (req.body.coins == null) ? null : req.body.coins;
 
+
             if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null  )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
-            var file = req.files.icon;
+            var file = req.files.file;
+            console.log(file);
             if(file == null){
                 return F.responseJson(res, "Icon Image is required !", {}, STATUS.BAD_REQUEST);
             }
@@ -290,16 +292,17 @@ var PCI = function(){
             }, function(err ,image, error){
                 if(err)
                     return F.responseJson(res, err, {});
-                var icon = '/public/uploades/' + fnAppend(file.name, 'thumb');
-                var query = "INSERT INTO `apps` (`id`, `name`, `icon`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`) VALUES (NULL, \'"+ name +"\', \'" + icon + "\', \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
-                    + platform + "\', \'" + offerID + "\', \'" + coins + "\')";
+            });
 
-                connection.query(query, function(err, rows){
-                    if(err)
-                        return F.responseJson(res, err, {});
+            var icon = '/public/uploades/' + fnAppend(file.name, 'thumb');
+            var query = "INSERT INTO `apps` (`id`, `name`, `icon`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`) VALUES (NULL, \'"+ name +"\', \'" + icon + "\', \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
+                + platform + "\', \'" + offerID + "\', \'" + coins + "\')";
 
-                    return F.responseJson(res, null, rows, STATUS.CREATED);
-                });
+            return connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null, rows, STATUS.CREATED);
             });
         });
     };
@@ -348,7 +351,7 @@ var PCI = function(){
                 query += " WHERE `id`=\'"+ req.params.id +"\'";
             }
 
-            console.log(query);
+            //console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
