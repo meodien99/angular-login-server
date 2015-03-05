@@ -1,8 +1,10 @@
 var F = require('../helpers/functions'),
     STATUS = require('../helpers/apiStatus');
 var moment = require('moment-timezone');
+var querystring = require('query-string');
 var image = require('easyimage');
 var http = require('http');
+
 
 function fnAppend(fn, insert) {
     var arr = fn.split('.');
@@ -45,7 +47,7 @@ var PCI = function(){
                         return F.responseJson(res, err, {});
 
                     for(var i in apps){
-                        console.log({offerid : apps[i].offerID});
+                        //console.log({offerid : apps[i].offerID});
                         for(var j = 0; j < records.length; j++){
                             if(apps[i].offerID === records[i].offerid){
                                 apps.splice(i,1);
@@ -86,97 +88,133 @@ var PCI = function(){
             connection.beginTransaction(function(err){
                 if(err)
                     throw err;
-
-
-
                 //find apps depend on offerID
                 var findApp = "SELECT * FROM `apps` WHERE offerID= \'"+ offerid +"\' AND platform=\'" + platform + "\' LIMIT 1";
+                //console.log(findApp);
                 connection.query(findApp, function(err, apps, fields){
                     if(err){
                         connection.rollback(function(){
-                            throw err;
+                            return F.responseJson(res, err, {});
                         })
                     }
 
-                    console.log(fields);
+                    if(apps.length < 1) {
+                        return F.responseJson(res, "Not found App contains offerId : " + offerid +" and platform : "+ platform);
+                    }
+                    //console.log(fields);
 
                     //check if user online
-                    var userQuery = "SELECT id,is_online,username from `xuser` WHERE `username`=\'" + user +"\' AND `is_ai`=(0) LIMIT 1";
-                    console.log(apps);
-                    return connection.query(userQuery, function(err, users){
+                    var userQuery = "SELECT ID,IS_ONLINE,USER_NAME from `xuser` WHERE `USER_NAME`=\'" + user +"\' AND `is_ai`=(0) LIMIT 1";
+                    console.log(userQuery);
+
+                    return connection.query({
+                        sql : userQuery
+                    }, function(err, users){
                         if(err){
                             connection.rollback(function(){
-                                throw err;
-                            });
-                        }
-                        console.log(users);
-                        //insert to record
-                        var saveToRecord = "INSERT INTO `record`(`id`,`offerid`,`transactionID`,`platform`,`user`,`deviceID`) VALUES(NULL,\'" + offerid +"\'," +
-                            transactionID + ", \'" + platform + "\', \'" + user + "\', \'" + deviceID + "\')";
-
-                        connection.query(saveToRecord, function(err, record){
-                            if(err){
-                                connection.rollback(function(){
-                                    throw err;
-                                });
-                            }
-                        });
-
-
-                        //insert to activity
-                        var message = "You have added " + apps[0].coins;
-                        var saveToActivity = "INSERT INTO `xuser_activity_message`(`id`,`xuser_id`,`content`,`created_date`,`new_activity`) VALUES(NULL,\'" + user[0].id +"\'," +
-                            transactionID + ", \'" + message + "\', \'" + new Date().toISOString().slice(0, 19).replace('T', ' ') + "\', (" + users[0].IS_ONLINE[0] + "))";
-
-                        return connection.query(saveToActivity, function(err, activity){
-                            if(err){
-                                connection.rollback(function(){
-                                    throw err;
-                                });
-                            }
-
-                            var mid = activity.insertId;
-
-                            //call to SmartFox API
-                            var post_data = querystring.stringify({
-                                'username' : user,
-                                'balance' : balance,
-                                'message' : message,
-                                'mid' : mid
-                            });
-                            var post_option = {
-                                host :  "http://52.10.41.39",
-                                port : 3768,
-                                path : "/service/cpi/notify",
-                                method : "POST",
-                                headers : {
-                                    'Content-Type': 'application/x-www-form-urlencoded',
-                                    'Content-Length': post_data.length
-                                }
-                            };
-
-                            //setup request
-                            var post_req = http.request(post_option, function(res){
-                                res.setEncoding('utf8');
-                                res.on('data', function (chunk) {
-                                    console.log('Response: ' + chunk);
-                                });
-                            });
-
-                            // post the data
-                            post_req.write(post_data);
-                            post_req.end();
-
-
-                            return connection.commit(function(err) {
-                                if (err) {
-                                    connection.rollback(function() {
-                                        throw err;
-                                    });
-                                }
                                 return F.responseJson(res, err, {});
                             });
-                        });
+                        }
+                        if(users.length < 1) {
+                            connection.rollback(function(){
+                                return F.responseJson(res, "User not found ", {}, STATUS.NOT_FOUND);
+                            });
+                        } else {
+                            //check if this user is already paid this app
+                            var checkUserAlreadyPaidQuery = "SELECT * FROM `record` WHERE `user`="+ connection.escape(users[0].USER_NAME) + " AND `deviceID`="
+                                + connection.escape(deviceID) + " AND `transactionID`= " + connection.escape(transactionID) + " AND `offerid`=" + connection.escape(offerid)
+                                + " AND platform=" + connection.escape(platform);
+                            console.log(checkUserAlreadyPaidQuery);
+
+                            connection.query(checkUserAlreadyPaidQuery, function(err, checked){
+                                if(err)
+                                    connection.rollback(function(){
+                                        return F.responseJson(res, err, {});
+                                    });
+
+                                if(checked.length > 0){
+                                    connection.rollback(function(){
+                                        console.log(123);
+                                        return F.responseJson(res, "Record already written", {});
+                                    });
+                                } else {
+                                    //insert to record
+                                    var saveToRecordQuery = "INSERT INTO `record`(`id`,`offerid`,`transactionID`,`platform`,`user`,`deviceID`) VALUES(NULL,\'" + offerid +"\', \'" +
+                                        transactionID + "\', \'" + platform + "\', \'" + user + "\', \'" + deviceID + "\')";
+
+                                    connection.query(saveToRecordQuery, function(err, record){
+                                        if(err){
+                                            connection.rollback(function(){
+                                                return F.responseJson(res, err, {});
+                                            });
+                                        }
+                                    });
+
+                                    //insert to activity
+                                    var message = "You have added " + apps[0].coins;
+                                    var activity = 1;
+                                    if(users[0].IS_ONLINE[0] == '1'){
+                                        activity = 0;
+                                    }
+                                    var saveToActivity = "INSERT INTO `xuser_activity_message`(`id`,`xuser_id`,`content`,`created_date`,`new_activity`) VALUES(NULL,\'" + users[0].ID +"\', \'"
+                                        + message + "\', \'" + new Date().toISOString().slice(0, 19).replace('T', ' ') + "\', (" + activity + "))";
+                                    return connection.query(saveToActivity, function(err, activity){
+                                        if(err){
+                                            connection.rollback(function(){
+                                                return F.responseJson(res, err, {});
+                                            });
+                                        }
+                                        var mid = activity.insertId;
+
+                                        //call to SmartFox API
+                                        var post_data = querystring.stringify({
+                                            'username' : user,
+                                            'balance' : apps[0].coins,
+                                            'message' : message,
+                                            'mid' : mid
+                                        });
+                                        console.log(post_data);
+                                        var post_option = {
+                                            host :  "52.10.41.39",
+                                            port : 3768,
+                                            path : "/service/cpi/notify",
+                                            method : "POST",
+                                            headers : {
+                                                'Content-Type': 'application/x-www-form-urlencoded',
+                                                'Content-Length': post_data.length
+                                            }
+                                        };
+
+                                        //setup request
+                                        var post_req = http.request(post_option, function(res){
+                                            console.log('STATUS: ' + res.statusCode);
+                                            console.log('HEADERS: ' + JSON.stringify(res.headers));
+                                            res.setEncoding('utf8');
+                                            res.on('data', function (chunk) {
+                                                console.log('BODY: ' + chunk);
+                                            });
+                                        });
+
+                                        post_req.on('error', function(e){
+                                            console.log("err : " + e.message);
+                                        });
+                                        // post the data
+                                        post_req.write(post_data);
+                                        post_req.end();
+
+
+                                        return connection.commit(function(err) {
+                                            if (err) {
+                                                connection.rollback(function() {
+                                                    return F.responseJson(res, err, {});
+                                                });
+                                            }
+                                            return F.responseJson(res, null, {result : "OK"}, STATUS.OK);
+                                        });
+                                    });
+                                }
+                            });
+                        }
                     });
                 });
             });
