@@ -122,6 +122,28 @@ var statistic = function(){
             });
         });
     };
+
+    self.getCCUByTime = function(req, res, next){
+        var from = req.query.from;
+        var to = req.query.to;
+
+        if(from == null || to == null){
+            return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "SELECT * FROM `ccu_log` WHERE (`date` BETWEEN \""+ from +"\" AND \""+ to +"\") ORDER BY `date` ASC";
+            connection.query(query, function(err, tasks){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null, tasks, STATUS.OK);
+            });
+        });
+    }
 };
 
 module.exports = statistic;

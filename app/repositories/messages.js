@@ -7,7 +7,7 @@ var messenger = function(){
     var self = this;
 
     function getMessageQuery(id){
-        var query = "SELECT * FROM xgame_system_message ";
+        var query = "SELECT * FROM xgame_notification ";
         if(id !== null){
             query += " WHERE id=\'" + id +"\'";
         }
@@ -53,14 +53,13 @@ var messenger = function(){
             var title = (req.body.title == null) ? null : req.body.title;
             var content = (req.body.content == null) ? null : req.body.content;
             var created_date = (req.body.created_date == null) ? new Date().toISOString().slice(0, 19).replace('T', ' ') : req.body.created_date;
-            var type = (req.body.type == null) ? null : req.body.type;
 
             var is_active = 1;
 
-            if(title == null || content == null || created_date == null || is_active == null || type == null )
+            if(title == null || content == null || created_date == null || is_active == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
-            var query = "INSERT INTO `xgame_system_message` (`id`, `title`, `image`, `content`, `created_date`, `is_active`, `type`) VALUES (NULL, \'"+ title +"\', NULL, \'"+ content +"\', \'"+ created_date +"\', b\'"+ is_active +"\', \'"+ type +"\')";
+            var query = "INSERT INTO `xgame_notification` (`id`, `title`, `content`, `created_date`, `active`) VALUES (NULL, \'"+ title +"\', \'"+ content +"\', \'"+ created_date +"\', \'"+ is_active +"\')";
 
             connection.query(query, function(err, rows){
                 if(err)
@@ -78,12 +77,11 @@ var messenger = function(){
             var title = (req.body.title == null) ? null : req.body.title;
             var content = (req.body.content == null) ? null : req.body.content;
             var is_active = (req.body.is_active == null) ? null : req.body.is_active;
-            var type = (req.body.type == null) ? null : req.body.type;
 
-            if(title == null || content == null || type == null )
+            if(title == null || content == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
-            var query = "UPDATE `xgame_system_message` SET `title`=\'"+ title +"\', `content`=\'"+ content +"\', `is_active`=b\'"+ is_active +"\', `type`=\'"+ type +"\' WHERE `id`=\'"+ req.params.id +"\'";
+            var query = "UPDATE `xgame_notification` SET `title`=\'"+ title +"\', `content`=\'"+ content +"\', `active`=\'"+ is_active +"\' WHERE `id`=\'"+ req.params.id +"\'";
 
 
             connection.query(query, function(err, rows){
@@ -100,7 +98,7 @@ var messenger = function(){
             if(err)
                 return F.responseJson(res, err, {});
             var id = req.params.id;
-            var query = "DELETE FROM `xgame_system_message` WHERE `id`="+id;
+            var query = "DELETE FROM `xgame_notification` WHERE `id`="+id;
 
             connection.query(query, function(err, rows){
                 if(err)
