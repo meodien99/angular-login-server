@@ -6,46 +6,10 @@ var statistic = function(){
 
     var self = this;
 
-    function getQueryInTimeRange(table, field,amount,type){
-        var query = "SELECT COUNT("+ field +") AS amount FROM `"+ table +"` where ("+ field +" BETWEEN DATE_SUB(NOW(), INTERVAL "+ parseInt(amount) +" "+ type.toUpperCase() + ") AND  NOW()) AND is_ai=(0)";
-
-        return query;
-    };
-    function getQueryFromTimeToTime(table, field, fromTime, toTime){
-        var query = 'SELECT COUNT('+ field +') AS amount FROM `'+ table +'` WHERE ('+ field +' BETWEEN \"'+ fromTime +'\" AND \"'+ toTime +'\") AND is_ai=(0)';
-            //query = 'SELECT COUNT(REGISTERED_DATE) AS amount FROM `xuser` USE INDEX(REGISTERED_DATE) WHERE (REGISTERED_DATE BETWEEN "2015-02-07" AND "2015-02-08") AND is_ai=(0)';
-        return query;
-    };
-
-    self.testFunc = function(req, res, next){
-        return res.json({r:123});
-    };
-    self.newUserByRanger = function(req, res, next){
-        var fromTime = req.query.from;
-        var toTime = req.query.to;
-        if(fromTime == null || toTime == null){
-            return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
-        }
-        req.getConnection(function(err, connection){
-            if(err)
-                return F.responseJson(res, err, {});
-
-            var selectQuery = getQueryFromTimeToTime("xuser","REGISTERED_DATE", fromTime, toTime);
-            console.log(selectQuery);
-            connection.query(selectQuery, function(err, rows){
-                if(err)
-                    return F.responseJson(res, err, {});
-
-                return F.responseJson(res, null, rows, STATUS.OK);
-            });
-        });
-    };
-
     self.newUserByTime = function(req, res, next){
-        var amount = req.query.amount;
-        var type = req.query.type;
-
-        if(amount == null || type == null){
+        var from = req.query.from;
+        var to = req.query.to;
+        if(from == null || to == null){
             return F.responseJson(res, "Amount or Type must be filled.", {}, STATUS.BAD_REQUEST);
         }
 
@@ -53,62 +17,18 @@ var statistic = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
+            var selectQuery = "SELECT u.USER_NAME,u.CALL_NUMBER, u.REGISTERED_DATE, u.last_login_time,u.current_xclient_type, u.xclient_type, u.FACEBOOK_ID, u.xcoin, u.TOTAL_NUM_WON, u.TOTAL_NUM_DRAW, u.TOTAL_NUM_LOSS, u.TOTAL_NUM_QUIT FROM xuser u  WHERE (u.REGISTERED_DATE BETWEEN \""+ from +"\" AND \""+ to +"\");";
 
-            var selectQuery = getQueryInTimeRange("xuser", "REGISTERED_DATE", amount, type);
-            console.log(selectQuery);
             connection.query(selectQuery, function(err, rows){
-                if(err)
+                if(err){
+                    console.log(err);
                     return F.responseJson(res, err, {});
-
+                }
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
         });
     };
 
-    self.playedUserByRange = function(req, res, next){
-        var fromTime = req.query.from;
-        var toTime = req.query.to;
-
-        if(fromTime == null || toTime == null){
-            return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
-        }
-
-        req.getConnection(function(err, connection){
-            if(err)
-                return F.responseJson(res, err, {});
-
-            var selectQuery = getQueryFromTimeToTime("xuser","last_login_time", fromTime, toTime);
-
-            connection.query(selectQuery, function(err, rows){
-                if(err)
-                    return F.responseJson(res, err, {});
-
-                return F.responseJson(res, null, rows, STATUS.OK);
-            });
-        });
-    };
-
-    self.playedUserByTime = function(req, res, next){
-        var amount = req.query.amount;
-        var type = req.query.type;
-
-        if(amount == null || type == null){
-            return F.responseJson(res, "Amount or Type must be filled.", {}, STATUS.BAD_REQUEST);
-        }
-
-        req.getConnection(function(err, connection){
-            if(err)
-                return F.responseJson(res, err, {});
-
-            var selectQuery = getQueryInTimeRange("xuser", "last_login_time", amount, type);
-            connection.query(selectQuery, function(err, rows){
-                if(err)
-                    return F.responseJson(res, err, {});
-
-                return F.responseJson(res, null, rows, STATUS.OK);
-            });
-        });
-    };
     self.activeUserByTime = function(req, res, next){
         var from = req.query.from;
         var to = req.query.to;
@@ -120,14 +40,13 @@ var statistic = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var selectQuery = "SELECT u.USER_NAME, u.REGISTERED_DATE, u.last_login_time, u.current_xclient_type, u.FACEBOOK_ID, u.xcoin FROM xuser u  WHERE (u.last_login_time BETWEEN \""+ from +"\" AND \""+ to +"\");";
+            var selectQuery = "SELECT u.USER_NAME, u.CALL_NUMBER, u.REGISTERED_DATE, u.last_login_time, u.current_xclient_type,u.xclient_type, u.FACEBOOK_ID, u.xcoin FROM xuser u  WHERE (u.last_login_time BETWEEN \""+ from +"\" AND \""+ to +"\");";
 
             connection.query(selectQuery, function(err, rows){
                 if(err){
                     console.log(err);
                     return F.responseJson(res, err, {});
                 }
-                console.log("Total Active User: " + rows.data);
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
         });
