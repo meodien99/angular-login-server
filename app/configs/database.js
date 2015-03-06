@@ -1,12 +1,12 @@
 'use strict';
 module.exports = {
-    'mysql' : {
+    /*'mysql' : {
      host : 'localhost',
      port : 3306,
      user : 'root',
      password : 'root',
      database : 'xgame'
-     }
+     }*/
     /*'mysql' : {
      host: '123.30.180.75',
      port: 7462,
@@ -28,4 +28,11 @@ module.exports = {
         password: 'mysqlanlon.com.vn',
         database: 'xgamedb'
     }*/
+    'mysql' : {
+        host : 'xgamedb.cxtcwijogw46.us-west-2.rds.amazonaws.com',
+        port : 3306,
+        user : 'root',
+        password : 'mysqlplaya',
+        database : 'xgamedb'
+    }
 };
