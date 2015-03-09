@@ -28,10 +28,11 @@ var user = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            var query = 'SELECT * FROM ccu_log WHERE WHERE  (date BETWEEN \""+ from +"\" AND \""+ to +"\") ORDER BY date DESC;';
+            var query = "SELECT * FROM ccu_log WHERE (date BETWEEN \""+ from +"\" AND \""+ to +"\") ORDER BY date DESC;";
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
+                console.log(rows);
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
         });
