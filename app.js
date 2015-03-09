@@ -5,7 +5,7 @@ var CronJob = require('cron').CronJob;
 var Record = require('./app/helpers/CCU-record');
 
 var job = new CronJob({
-    cronTime : '* */6 * * * *',
+    cronTime : '0 */10 * * * *',
     onTick : function(){
         "use strict";
         var recode = new Record();
