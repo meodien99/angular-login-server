@@ -24,6 +24,7 @@ var PCI = function(){
             deviceID = (req.query.deviceID) ? req.query.deviceID : null,
             user = (req.query.user) ? req.query.user : null;
 
+        var affID = 2;
         if(platform === null){
             return F.responseJson(res, "PlatForm is empty", {}, STATUS.BAD_REQUEST);
         }
@@ -45,18 +46,23 @@ var PCI = function(){
                 connection.query(recordQuery, function(err, records){
                     if(err)
                         return F.responseJson(res, err, {});
-
-                    for(var i in apps){
-                        //console.log({offerid : apps[i].offerID});
-                        for(var j = 0; j < records.length; j++){
-                            if(apps[i].offerID === records[i].offerid){
-                                apps.splice(i,1);
-                                break;
-                            }
+                    var r = [];
+                    for(var i in records){
+                        r.push(records[i].offerid);
+                    }
+                    var a = [];
+                    for(var i = 0; i< apps.length; i ++){
+                        if(!F.inArray(apps[i].offerID, r)){
+                            a.push(apps[i]);
                         }
+
+                    }
+                    for(var i in a ){
+                        a[i]["trackingURL"] = "http://tracking.leadsgen.asia/aff_c?offer_id="+ a[i].offerID +
+                        "&aff_id=" + affID + "&platform=" + a[i].platform + "&user=" + user + "&deviceId=" + deviceID;
                     }
 
-                    return F.responseJson(res, null, apps, STATUS.OK);
+                    return F.responseJson(res, null, a, STATUS.OK);
                 });
             });
         });

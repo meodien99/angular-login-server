@@ -123,5 +123,6 @@ module.exports = {
             }
         }
         return true;
-    }
+    },
+    inArray: inArray
 };
