@@ -5,5 +5,6 @@ var express = require('express'),
 var userRepo = new UserRepository();
 
 router.get('/', userRepo.getUser.bind(userRepo));
+router.get('/ccu', userRepo.getCCU.bind(userRepo));
 
 module.exports = router;

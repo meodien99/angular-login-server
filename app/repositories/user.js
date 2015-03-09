@@ -18,6 +18,24 @@ var user = function(){
             });
         });
     };
+    self.getCCU = function(req, res, next){
+        var from = req.query.from;
+        var to = req.query.to;
+        console.log("CCU by time " +from +"-"+to);
+        if(from == null || to == null){
+            return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
+        }
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+            var query = 'SELECT * FROM ccu_log WHERE WHERE  (date BETWEEN \""+ from +"\" AND \""+ to +"\") ORDER BY date DESC;';
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+                return F.responseJson(res, null, rows, STATUS.OK);
+            });
+        });
+    };
 };
 
 module.exports = user;
