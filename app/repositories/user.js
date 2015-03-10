@@ -47,7 +47,7 @@ var user = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            var query = "SELECT * FROM user_feedback WHERE (created_date BETWEEN \""+ from +"\" AND \""+ to +"\") ORDER BY id DESC;";
+            var query = "SELECT f.`id`, f.`user_name`, f.`created_date`, f.`content`, `xuser`.`xclient_type` FROM user_feedback f INNER JOIN `xuser` ON  f.`user_name` = `xuser`.`USER_NAME` WHERE (created_date BETWEEN \""+ from +"\" AND \""+ to +"\") ORDER BY f.id DESC;";
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
