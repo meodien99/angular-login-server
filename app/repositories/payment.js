@@ -13,7 +13,6 @@ var payment = function(){
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
-        console.log(" get Card");
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
@@ -33,7 +32,6 @@ var payment = function(){
     self.getSmsByTime = function(req, res){
         var from = req.query.from;
         var to = req.query.to;
-        console.log("sms by time " +from +"-"+to);
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
@@ -55,7 +53,6 @@ var payment = function(){
     self.getBankTransferByTime = function(req, res){
         var from = req.query.from;
         var to = req.query.to;
-        console.log("BankTransfer by time " +from +"-"+to);
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }

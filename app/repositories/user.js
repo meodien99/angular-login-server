@@ -21,7 +21,6 @@ var user = function(){
     self.getCCU = function(req, res, next){
         var from = req.query.from;
         var to = req.query.to;
-        console.log("CCU by time " +from +"-"+to);
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
@@ -32,7 +31,6 @@ var user = function(){
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
-                console.log(rows);
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
         });
@@ -40,7 +38,6 @@ var user = function(){
     self.getFeedback = function(req, res, next){
         var from = req.query.from;
         var to = req.query.to;
-        console.log("Feedback by time " +from +"-"+to);
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
