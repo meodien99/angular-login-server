@@ -36,5 +36,4 @@ module.exports = {
         password : 'mysqlplaya',
         database : 'xgamedb'
     }
-     
 };

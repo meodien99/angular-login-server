@@ -22,9 +22,10 @@ var PCI = function(){
     self.getAppUserCanInstall = function(req, res, next){
         var platform = (req.query.platform) ? req.query.platform : null,
             deviceID = (req.query.deviceID) ? req.query.deviceID : null,
-            user = (req.query.user) ? req.query.user : null;
-
+            user = (req.query.user) ? req.query.user : null,
+            type = (req.query.type) ? req.query.type : null;
         var affID = 2;
+
         if(platform === null){
             return F.responseJson(res, "PlatForm is empty", {}, STATUS.BAD_REQUEST);
         }
@@ -32,11 +33,19 @@ var PCI = function(){
         if(deviceID === null || user === null){
             return F.responseJson(res, "User or device is empty", {}, STATUS.BAD_REQUEST);
         }
+
+        if(type === null ){
+            return F.responseJson(res, "Type is empty", {}, STATUS.BAD_REQUEST);
+        } else if (type !== "coins" && type !== "gems"){
+            return F.responseJson(res, "Type data is invalid", {}, STATUS.BAD_REQUEST);
+        }
+
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var appsQuery = "SELECT * FROM apps WHERE eDate >= CURDATE() AND platform =\"" + platform + "\"";
+            var appsQuery = "SELECT * FROM apps WHERE eDate >= CURDATE() AND platform =\"" + platform + "\" AND " + type + " > 0;";
+            console.log(appsQuery)
             connection.query(appsQuery, function(err, apps){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -87,6 +96,7 @@ var PCI = function(){
         if(deviceID === null || user === null){
             return F.responseJson(res, "User or device are required", {}, STATUS.BAD_REQUEST);
         }
+
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
@@ -157,7 +167,17 @@ var PCI = function(){
                                     });
 
                                     //insert to activity
-                                    var message = "You have added " + apps[0].coins;
+                                    var message = "You have added ";
+                                    if(apps[0].coins > 0) {
+                                        var coins = apps[0].coins;
+                                        message += " " + coins +" coins";
+                                    }
+                                    if(apps[0].gems > 0) {
+                                        var gems = apps[0].gems
+                                        message += " " + gems +" gems";
+                                    }
+                                    console.log(message);
+
                                     var activity = 1;
                                     if(users[0].IS_ONLINE[0] == '1'){
                                         activity = 0;
@@ -177,8 +197,10 @@ var PCI = function(){
                                             'username' : user,
                                             'balance' : apps[0].coins,
                                             'message' : message,
-                                            'mid' : mid
+                                            'mid' : mid,
+                                            'gold' : apps[0].gems
                                         });
+
                                         console.log(post_data);
                                         var post_option = {
                                             host :  "52.10.41.39",
