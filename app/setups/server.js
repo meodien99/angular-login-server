@@ -38,6 +38,7 @@ var server = function(app){
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(cookieParser());
     app.use(express.static(path.join(__dirname, '../../public')));
+    app.use('/public', express.static(path.join(__dirname, '../../public')));
 
     app.use(methodOverride(function(req, res){
         if (req.body && typeof req.body === 'object' && '_method' in req.body) {

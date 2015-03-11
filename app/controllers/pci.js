@@ -6,9 +6,9 @@ var pciRepo = new PCIRepository();
 
 
 router
-    //?platform=&user=&deviceID=
+    //?platform=&user=&deviceID=&type=
     .get('/api/apps/offers', pciRepo.getAppUserCanInstall.bind(pciRepo))
-    //?offerID=&platform=&user=&deviceID=&transactionID=
+    //
     .get('/api/records/cpi', pciRepo.getSaveToRecord.bind(pciRepo))
     //crud
     .get('/pcis', pciRepo.getAllApps.bind(pciRepo))

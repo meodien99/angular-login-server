@@ -22,9 +22,10 @@ var PCI = function(){
     self.getAppUserCanInstall = function(req, res, next){
         var platform = (req.query.platform) ? req.query.platform : null,
             deviceID = (req.query.deviceID) ? req.query.deviceID : null,
-            user = (req.query.user) ? req.query.user : null;
-
+            user = (req.query.user) ? req.query.user : null,
+            type = (req.query.type) ? req.query.type : null;
         var affID = 2;
+
         if(platform === null){
             return F.responseJson(res, "PlatForm is empty", {}, STATUS.BAD_REQUEST);
         }
@@ -32,11 +33,19 @@ var PCI = function(){
         if(deviceID === null || user === null){
             return F.responseJson(res, "User or device is empty", {}, STATUS.BAD_REQUEST);
         }
+
+        if(type === null ){
+            return F.responseJson(res, "Type is empty", {}, STATUS.BAD_REQUEST);
+        } else if (type !== "coins" && type !== "gems"){
+            return F.responseJson(res, "Type data is invalid", {}, STATUS.BAD_REQUEST);
+        }
+
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var appsQuery = "SELECT * FROM apps WHERE eDate >= CURDATE() AND platform =\"" + platform + "\"";
+            var appsQuery = "SELECT * FROM apps WHERE eDate >= CURDATE() AND platform =\"" + platform + "\" AND " + type + " > 0;";
+            console.log(appsQuery)
             connection.query(appsQuery, function(err, apps){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -87,6 +96,7 @@ var PCI = function(){
         if(deviceID === null || user === null){
             return F.responseJson(res, "User or device are required", {}, STATUS.BAD_REQUEST);
         }
+
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
@@ -157,7 +167,17 @@ var PCI = function(){
                                     });
 
                                     //insert to activity
-                                    var message = "You have added " + apps[0].coins;
+                                    var message = "You have added ";
+                                    if(apps[0].coins > 0) {
+                                        var coins = apps[0].coins;
+                                        message += " " + coins +" coins";
+                                    }
+                                    if(apps[0].gems > 0) {
+                                        var gems = apps[0].gems
+                                        message += " " + gems +" gems";
+                                    }
+                                    console.log(message);
+
                                     var activity = 1;
                                     if(users[0].IS_ONLINE[0] == '1'){
                                         activity = 0;
@@ -177,8 +197,10 @@ var PCI = function(){
                                             'username' : user,
                                             'balance' : apps[0].coins,
                                             'message' : message,
-                                            'mid' : mid
+                                            'mid' : mid,
+                                            'gold' : apps[0].gems
                                         });
+
                                         console.log(post_data);
                                         var post_option = {
                                             host :  "52.10.41.39",
@@ -269,18 +291,19 @@ var PCI = function(){
 
             var name = (req.body.name == null) ? null : req.body.name;
             var description = (req.body.description == null) ? null : req.body.description;
-            var eDate = (req.body.eDate == null) ? null : req.body.eDate;
-            var sDate = (req.body.sDate == null) ? null : req.body.sDate;
+            var eDate = (req.body.eDate == null) ? null : req.body.eDate.replace('Z','').replace('"','').replace('T', ' ');
+            var sDate = (req.body.sDate == null) ? null : req.body.sDate.replace('Z','').replace('"','').replace('T', ' ');
             var offerID = (req.body.offerID == null) ? null : req.body.offerID;
             var platform = (req.body.platform == null) ? null : req.body.platform;
             var coins = (req.body.coins == null) ? null : req.body.coins;
+            var gems = (req.body.gems == null ) ? null : req.body.gems;
 
-
-            if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null  )
+            console.log(eDate);
+            if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null || gems == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
             var file = req.files.file;
-            console.log(file);
+            //console.log(file);
             if(file == null){
                 return F.responseJson(res, "Icon Image is required !", {}, STATUS.BAD_REQUEST);
             }
@@ -300,10 +323,11 @@ var PCI = function(){
                     return F.responseJson(res, err, {});
             });
 
-            var icon = '/public/uploades/' + fnAppend(file.name, 'thumb');
-            var query = "INSERT INTO `apps` (`id`, `name`, `icon`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`) VALUES (NULL, \'"+ name +"\', \'" + icon + "\', \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
-                + platform + "\', \'" + offerID + "\', \'" + coins + "\')";
+            var icon = '/public/uploads/' + fnAppend(file.name, 'thumb');
+            var query = "INSERT INTO `apps` (`id`, `name`, `icon`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`, `gems`) VALUES (NULL, \'"+ name +"\', \'" + icon + "\', \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
+                + platform + "\', \'" + offerID + "\', \'" + coins + "\'," + connection.escape(gems) + ")";
 
+            //console.log(query);
             return connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -320,22 +344,23 @@ var PCI = function(){
                 return F.responseJson(res, err, {});
             var name = (req.body.name == null) ? null : req.body.name;
             var description = (req.body.description == null) ? null : req.body.description;
-            var eDate = (req.body.eDate == null) ? null : req.body.eDate;
-            var sDate = (req.body.sDate == null) ? null : req.body.sDate;
+            var eDate = (req.body.eDate == null) ? null : req.body.eDate.replace('Z','').replace('"','').replace('T', ' ');
+            var sDate = (req.body.sDate == null) ? null : req.body.sDate.replace('Z','').replace('"','').replace('T', ' ');
             var offerID = (req.body.offerID == null) ? null : req.body.offerID;
             var platform = (req.body.platform == null) ? null : req.body.platform;
             var coins = (req.body.coins == null) ? null : req.body.coins;
+            var gems = (req.body.gems == null) ? null : req.body.gems;
 
-
-            if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null  )
+            console.log(eDate);
+            if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null || gems == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
             var query = "UPDATE `apps` SET `name`=\'"+ name +"\', `description`=\'"+ description +"\', `eDate`=\'"+ eDate +"\', `sDate`=\'"+ sDate +"\', `offerID`=\'" + offerID + "\', `platform`=\'"
-                + platform +"\', `coins`=\'" + coins + "\'";
+                + platform +"\', `coins`=\'" + coins + "\', `gems`=" + connection.escape(gems);
 
-            var file = req.files.icon;
+            var file = req.files.file;
             if(file){
-
+                console.log(1);
                 var type = file.mimetype;
                 if(type !== 'image/png' && type !== 'image/jpeg' && type !== 'image/gif' && type !== 'image/jpg'){
                     return F.responseJson(res, "Icon must be image type !", {}, STATUS.BAD_REQUEST);
@@ -349,7 +374,7 @@ var PCI = function(){
                     if(err)
                         return F.responseJson(res, err, {});
                 });
-                var icon = '/public/uploades/' + fnAppend(file.name, 'thumb');
+                var icon = '/public/uploads/' + fnAppend(file.name, 'thumb');
                 query += ", `icon`=\'" + icon + "\' WHERE `id`=\'"+ req.params.id +"\'";
             } else {
                 console.log(2);
@@ -357,7 +382,7 @@ var PCI = function(){
                 query += " WHERE `id`=\'"+ req.params.id +"\'";
             }
 
-            //console.log(query);
+            console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});

@@ -29,7 +29,7 @@ module.exports = {
         database: 'xgamedb'
     }
 
-   /* 'mysql' : {
+    /*'mysql' : {
         host : 'xgamedb.cxtcwijogw46.us-west-2.rds.amazonaws.com',
         port : 3306,
         user : 'root',
