@@ -29,6 +29,13 @@ var routers = function(app){
         }
     }
 
+    //log writer
+    app.use(function(req, res, next){
+        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+        console.log(req.method);
+        next();
+    })
+
     //# api/app/*
     app.use('/', pci);
     //# /login
@@ -82,6 +89,8 @@ var routers = function(app){
             message : err.message
         })
     });
+
+
 };
 
 module.exports = routers;

@@ -29,7 +29,6 @@ var event = function(){
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
-        console.log(" get Card");
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
@@ -45,6 +44,7 @@ var event = function(){
             });
         });
     };
+
     self.updateEvent = function(req, res){
         var from = req.query.from;
         var to = req.query.to;
@@ -52,7 +52,6 @@ var event = function(){
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
-        console.log(" get Card");
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});

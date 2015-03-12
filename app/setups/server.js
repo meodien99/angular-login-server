@@ -17,6 +17,8 @@ var server = function(app){
     var jwt = require('jsonwebtoken');
     var multer = require('multer');
     var multer_path = require('../configs/multer_path');
+    var moment = require('moment-timezone');
+    moment.tz("ASIA/SAIGON").format();
     process.env['JWT_SECRET'] = 'JWTSECRETKEY';
 
     //setup mysql driven

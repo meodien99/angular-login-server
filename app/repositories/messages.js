@@ -6,21 +6,22 @@ var messenger = function(){
 
     var self = this;
 
-    function getMessageQuery(id){
-        var query = "SELECT * FROM xgame_notification ";
+    function getMessageQuery(id, table){
+
+        var query = "SELECT * FROM " + table + " ";
         if(id !== null){
             query += " WHERE id=\'" + id +"\'";
         }
         query += " ORDER BY created_date DESC";
         return query;
-    };
+    }
 
     self.getMessages = function(req, res, next){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = getMessageQuery(null);
+            var query = getMessageQuery(null, "xgame_notification");
             //console.log(query);
             connection.query(query, function(err, rows){
                if(err)
@@ -36,7 +37,7 @@ var messenger = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = getMessageQuery(req.params.id);
+            var query = getMessageQuery(req.params.id, "xgame_notification");
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -108,6 +109,24 @@ var messenger = function(){
             });
         });
     };
+
+    /*========================================= XGAME_SYSTEM_MESSAGE =====================================================*/
+
+    self.getAllXMessage = function(req, res, next){
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = getMessageQuery(null, "xgame_system_message");
+            //console.log(query);
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null, rows, STATUS.OK);
+            });
+        });
+    }
 };
 
 module.exports = messenger;
