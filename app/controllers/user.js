@@ -8,7 +8,7 @@ router
     .get('/', userRepo.getUser.bind(userRepo))
     .get('/ccu', userRepo.getCCU.bind(userRepo))
     .get('/feedback', userRepo.getFeedback.bind(userRepo))
-    .post('/user', userRepo.postFindUser.bind(userRepo))
-    .get('/user/:username/change', userRepo.resetPassword.bind(userRepo));
+    .post('/find', userRepo.postFindUser.bind(userRepo))
+    .post('/:username/change', userRepo.resetPassword.bind(userRepo));
 
 module.exports = router;

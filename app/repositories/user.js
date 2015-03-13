@@ -79,6 +79,10 @@ var user = function(){
                 if(err)
                     return F.responseJson(res, err, {});
 
+                if(rows.length < 1){
+                    return F.responseJson(res, "User not found.", null, STATUS.NOT_FOUND);
+                }
+
                 return F.responseJson(res, null , rows, STATUS.OK);
             });
         });
