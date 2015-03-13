@@ -60,7 +60,6 @@ var event = function(){
 
             connection.query(query, function(err, tasks){
                 if(err){
-                    console.log("ERROR: get card by time " + err)
                     return F.responseJson(res, err, {});
                 }
                 return F.responseJson(res, null, tasks, STATUS.OK);

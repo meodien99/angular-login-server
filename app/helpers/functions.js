@@ -1,8 +1,7 @@
 var API = require('./apiStatus'),
-    mysql = require('mysql'),
-    mysqlConfig = require('../configs/database').mysql;
+    jwt = require('jsonwebtoken'),
+    moment = require('moment-timezone');
 
-var connection  = mysql.createConnection(mysqlConfig);
 
 //return array by key given
 var objectKeyFilter = function(needle, key){
@@ -129,22 +128,27 @@ module.exports = {
         return true;
     },
     inArray: inArray,
-    logger : function(res, action, user){
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    /**
+     *
+     * @param connect
+     * @param req
+     * @param action String
+     */
+    logger : function(connect, req, action){
+        var ip = req.ip_address;
+        var user = jwt.verify(req.token, process.env.JWT_SECRET).email;
         var time = moment().tz("Asia/Saigon").format().slice(0, 19).replace('T', ' ');
 
-        connection.connect(function(err, connect){
+        //console.log(user)
+        var query = "INSERT INTO `user_log`(`id`,`ip`,`username`,`action`,`time`) VALUES(NULL, " + connect.escape(ip) + " , " + connect.escape(user)
+            + " , " + connect.escape(action) + " , " + connect.escape(time) + ")";
+
+        //console.log(query);
+        connect.query(query, function(err, rows){
             if(err)
                 console.log(err);
 
-            var query = "INSERT INTO `user_log`(`id`,`ip`,`username`,`action`,`time`) SET(NULL, " + connect.escape(ip) + " , " + connect.escape(user)
-                + " , " + connect.escape(action) + " , " + time + ")";
-            connect.query(query, function(err, rows){
-                if(err)
-                    console.log(err);
-
-                console.log(rows);
-            });
-        })
+            console.log(rows);
+        });
     }
 };

@@ -37,6 +37,7 @@ var user = function(){
             });
         });
     };
+
     self.getFeedback = function(req, res, next){
         var from = (req.query.from === null)  ? null : req.query.from.replace('"','').replace('T',' ').slice(0,19);
         var to = (req.query.to === null) ? null : req.query.to.replace('"','').replace('T',' ').slice(0,19);
@@ -51,11 +52,13 @@ var user = function(){
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
-                console.log(rows);
+
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
         });
     };
+
+
 };
 
 module.exports = user;

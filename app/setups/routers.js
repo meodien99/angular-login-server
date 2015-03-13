@@ -22,19 +22,13 @@ var routers = function(app){
             var bearer = bearerHeader.split(" ");
             bearerToken = bearer[1];
             //console.log(bearerToken);
+            req.ip_address = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
             req.token = bearerToken;
             next();
         } else {
             res.sendStatus(401);
         }
     }
-
-    //log writer
-    app.use(function(req, res, next){
-        var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-        console.log(req.method);
-        next();
-    })
 
     //# api/app/*
     app.use('/', pci);

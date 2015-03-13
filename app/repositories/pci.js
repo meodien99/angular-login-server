@@ -298,7 +298,7 @@ var PCI = function(){
             var coins = (req.body.coins == null) ? null : req.body.coins;
             var gems = (req.body.gems == null ) ? null : req.body.gems;
 
-            console.log(eDate);
+            //console.log(eDate);
             if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null || gems == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
@@ -332,6 +332,8 @@ var PCI = function(){
                 if(err)
                     return F.responseJson(res, err, {});
 
+                F.logger(connection, req, "Create new app");
+
                 return F.responseJson(res, null, rows, STATUS.CREATED);
             });
         });
@@ -360,7 +362,7 @@ var PCI = function(){
 
             var file = req.files.file;
             if(file){
-                console.log(1);
+                //console.log(1);
                 var type = file.mimetype;
                 if(type !== 'image/png' && type !== 'image/jpeg' && type !== 'image/gif' && type !== 'image/jpg'){
                     return F.responseJson(res, "Icon must be image type !", {}, STATUS.BAD_REQUEST);
@@ -377,15 +379,16 @@ var PCI = function(){
                 var icon = '/public/uploads/' + fnAppend(file.name, 'thumb');
                 query += ", `icon`=\'" + icon + "\' WHERE `id`=\'"+ req.params.id +"\'";
             } else {
-                console.log(2);
+                //console.log(2);
 
                 query += " WHERE `id`=\'"+ req.params.id +"\'";
             }
 
-            console.log(query);
+            //console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
+                F.logger(connection, req, "Update App Id : " + req.params.id);
 
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
@@ -400,9 +403,12 @@ var PCI = function(){
             var id = req.params.id;
             var query = "DELETE FROM `apps` WHERE `id`="+id;
 
+            console.log(req.token);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
+
+                F.logger(connection, req, "Delete App PCI :" + id);
 
                 return F.responseJson(res, null, rows, STATUS.OK);
             });
