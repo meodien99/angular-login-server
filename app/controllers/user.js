@@ -4,8 +4,11 @@ var express = require('express'),
 
 var userRepo = new UserRepository();
 
-router.get('/', userRepo.getUser.bind(userRepo));
-router.get('/ccu', userRepo.getCCU.bind(userRepo));
-router.get('/feedback', userRepo.getFeedback.bind(userRepo));
+router
+    .get('/', userRepo.getUser.bind(userRepo))
+    .get('/ccu', userRepo.getCCU.bind(userRepo))
+    .get('/feedback', userRepo.getFeedback.bind(userRepo))
+    .post('/user', userRepo.postFindUser.bind(userRepo))
+    .get('/user/:username/change', userRepo.resetPassword.bind(userRepo));
 
 module.exports = router;

@@ -21,7 +21,7 @@ var authentication = function(){
             if(err) {
                 return F.responseJson(res, err, {});
             }
-            var queryUser = 'SELECT * FROM xadmin WHERE username=\''+username+'\' limit 1';
+            var queryUser = 'SELECT `username`,`password`,`verificationToken`,`role_id`,`email` FROM `xadmin` WHERE username='+ connection.escape(username) + ' limit 1';
             connection.query(queryUser, function(err, admin){
                 if(err){
                     return F.responseJson(res, err, {});
@@ -33,9 +33,21 @@ var authentication = function(){
                     if(err)
                         return F.responseJson(res, err, {});
                     if(isMatch === true){
+                        var role;
+                        switch (admin[0].role_id){
+                            case 1 :
+                                role = "Admin"; break;
+                            case 2 :
+                                role = "User"; break;
+                            case 3 :
+                                role = "Payment"; break;
+                            default :
+                                role = "PCI"; break;
+                        }
+
                         var userInfo = {
                             username : admin[0].username,
-                            roles : ['Admin','User'],
+                            roles : [role],
                             email : admin[0].email,
                             token : admin[0].verificationToken
                         };

@@ -58,7 +58,57 @@ var user = function(){
         });
     };
 
+    /*
+     * ============================== USER =========================================
+     * */
 
+    self.postFindUser = function(req, res, next){
+        var username = (req.body.username === null)? null : req.body.username;
+
+        if(username == null){
+            return F.responseJson(res, "Username is not empty.", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "SELECT * FROM `xuser` WHERE `USER_NAME` = " + connection.escape(username);
+
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.resetPassword = function(req, res, next){
+        var username = (req.params.username === null ) ? null : req.params.username;
+        var nPassword = (req.body.nPassword === null ) ? null : req.body.nPassword;
+
+        if(username === null || nPassword === null){
+            return F.responseJson(res, "Password is required.", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "UPDATE `xuser` SET `password`=" + connection.escape(nPassword) + " WHERE `USER_NAME`=" + connection.escape(username);
+
+            connection.query(query, function(err, row){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                //log
+                F.logger(connection, req, "Change user password  : " + username);
+
+                return F.responseJson(res, null , row, STATUS.OK);
+            });
+        });
+    }
 };
 
 module.exports = user;
