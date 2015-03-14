@@ -14,7 +14,6 @@ var server = function(app){
     var mysqlConfig = require('../configs/database').mysql;
     var connection = require('express-myconnection');
     var bcrypt = require('bcrypt-nodejs');
-    var jwt = require('jsonwebtoken');
     var multer = require('multer');
     var multer_path = require('../configs/multer_path');
     var moment = require('moment-timezone');

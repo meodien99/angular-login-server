@@ -1,5 +1,6 @@
 var F = require('../helpers/functions'),
-    STATUS = require('../helpers/apiStatus');
+    STATUS = require('../helpers/apiStatus'),
+    bcrypt = require('bcrypt-nodejs');
 
 var user = function(){
     "use strict";
@@ -112,7 +113,115 @@ var user = function(){
                 return F.responseJson(res, null , row, STATUS.OK);
             });
         });
-    }
+    };
+
+    /* *
+     * ============================== ADMIN USER =========================================
+     * */
+
+    self.getAllAdmin = function(req, res, next){
+        req.getConnection(function(err, connect){
+            var query = "SELECT * FROM `xadmin`";
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.postResetPassAdmin = function(req, res, next){
+        var adminUser = (req.params.adminUser === null ) ? null : req.params.adminUser;
+        var nPassword = (req.body.nPassword === null ) ? null : req.body.nPassword;
+
+        if( nPassword === null){
+            return F.responseJson(res, "admin password is required" , null, STATUS.OK);
+        }
+
+        var password = bcrypt.hashSync(nPassword);
+        console.log(password);
+        req.getConnection(function(err, connect){
+            var query = "UPDATE `xadmin` SET `password`= \"" + password + "\" WHERE `username`= " + connect.escape(adminUser);
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                F.logger(connect, req, "Change admin password  : " + adminUser);
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.postChangePermission = function(req, res, next){
+        var adminUser = (req.params.adminUser === null ) ? null : req.params.adminUser;
+        var role_id = (req.body.role_id === null ) ? null : req.body.role;
+
+        if(role_id == null){
+            return F.responseJson(res, "role ID is required", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connect){
+            var query = "UPDATE `xadmin` SET `role_id`= " + connect.escape(role_id) + " WHERE `username`= " + connect.escape(adminUser);
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                F.logger(connect, req, "Change admin permission : " + adminUser);
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.postAddAdminUser = function(req, res, next){
+        var username = (req.body.username == null) ? null : req.body.username;
+        var password = (req.body.password == null) ? null : req.body.password;
+        var role = (req.body.role_id == null) ? null : req.body.role_id;
+
+        password = bcrypt.hashSync(password);
+        var token = jwt.sign({
+            username : username,
+            password : password
+        }, process.env.JWT_SECRET);
+
+        req.getConnection(function(err, connect){
+            var query = "INSERT INTO `xadmin`(`id`, `username`, `password`, `role_id`, `token`)  VALUES(NULL, " + connect.escape(username) + ", "
+                + connect.escape(password) + ", " + connect.escape(role) + ", " + connect.escape(token) + ") WHERE `username`= " + connect.escape(username);
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                F.logger(connect, req, "Add new Admin : " + username);
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.deleteAdminUser = function(req, res, next){
+
+        req.getConnection(function(err, connect){
+            if(err)
+                return F.responseJson(res, err, {});
+            var username = req.params.username;
+            var query = "DELETE FROM `xadmin` WHERE `username`= " + username;
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                F.logger(connect, req, "Delete Admin : " + username);
+
+                return F.responseJson(res, null, rows, STATUS.OK);
+            });
+        });
+    };
 };
 
 module.exports = user;
