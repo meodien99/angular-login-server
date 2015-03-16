@@ -1,6 +1,7 @@
 var F = require('../helpers/functions'),
     STATUS = require('../helpers/apiStatus'),
-    bcrypt = require('bcrypt-nodejs');
+    bcrypt = require('bcrypt-nodejs')
+    jwt = require('jsonwebtoken');
 
 var user = function(){
     "use strict";
@@ -120,9 +121,10 @@ var user = function(){
      * */
 
     self.getAllAdmin = function(req, res, next){
+        var username = jwt.verify(req.token, process.env.JWT_SECRET).email;
         req.getConnection(function(err, connect){
-            var query = "SELECT * FROM `xadmin`";
-
+            var query = "SELECT * FROM `xadmin` INNER JOIN `admin_roles` ON `xadmin`.`role_id` = `admin_roles`.`id` WHERE `xadmin`.`username` !="+connect.escape(username) ;
+            //console.log(query);
             connect.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -140,10 +142,15 @@ var user = function(){
             return F.responseJson(res, "admin password is required" , null, STATUS.OK);
         }
 
+        var code = jwt.sign({
+            email : adminUser,
+            password : nPassword
+        }, process.env.JWT_SECRET);
+
         var password = bcrypt.hashSync(nPassword);
-        console.log(password);
+
         req.getConnection(function(err, connect){
-            var query = "UPDATE `xadmin` SET `password`= \"" + password + "\" WHERE `username`= " + connect.escape(adminUser);
+            var query = "UPDATE `xadmin` SET `password` = \"" + password + "\", `verificationToken` = \"" + code + "\" WHERE `username`= " + connect.escape(adminUser);
 
             connect.query(query, function(err, rows){
                 if(err)
@@ -156,7 +163,7 @@ var user = function(){
         });
     };
 
-    self.postChangePermission = function(req, res, next){
+    self.putChangePermission = function(req, res, next){
         var adminUser = (req.params.adminUser === null ) ? null : req.params.adminUser;
         var role_id = (req.body.role_id === null ) ? null : req.body.role;
 
@@ -183,15 +190,23 @@ var user = function(){
         var password = (req.body.password == null) ? null : req.body.password;
         var role = (req.body.role_id == null) ? null : req.body.role_id;
 
+        if(username == null){
+            return F.responseJson(res, "Admin username is required", {}, STATUS.BAD_REQUEST);
+        }
+        if(password == null){
+            return F.responseJson(res, "Admin Password is required", {}, STATUS.BAD_REQUEST);
+        }
+
         password = bcrypt.hashSync(password);
         var token = jwt.sign({
-            username : username,
+            email : username,
             password : password
         }, process.env.JWT_SECRET);
 
         req.getConnection(function(err, connect){
-            var query = "INSERT INTO `xadmin`(`id`, `username`, `password`, `role_id`, `token`)  VALUES(NULL, " + connect.escape(username) + ", "
-                + connect.escape(password) + ", " + connect.escape(role) + ", " + connect.escape(token) + ") WHERE `username`= " + connect.escape(username);
+            var query = "INSERT INTO `xadmin`(`id`, `username`, `password`, `role_id`, `verificationToken`)  VALUES(NULL, " + connect.escape(username) + ", "
+                + connect.escape(password) + ", " + connect.escape(role) + ", " + connect.escape(token) + ")";
+            //console.log(query);
 
             connect.query(query, function(err, rows){
                 if(err)
@@ -205,13 +220,15 @@ var user = function(){
     };
 
     self.deleteAdminUser = function(req, res, next){
+        var username = req.params.adminUser;
 
         req.getConnection(function(err, connect){
             if(err)
                 return F.responseJson(res, err, {});
-            var username = req.params.username;
-            var query = "DELETE FROM `xadmin` WHERE `username`= " + username;
 
+            var query = "DELETE FROM `xadmin` WHERE `username`= " + connect.escape(username);
+
+            //console.log(query);
             connect.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
