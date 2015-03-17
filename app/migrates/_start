@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `migrate` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY `migrate` (`migrate`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
