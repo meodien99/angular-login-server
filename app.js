@@ -22,8 +22,6 @@ var job = new CronJob({
 if(yargs.c){
     console.log('cron job is running ...');
     job.start();
-} else {
-    console.log('cron job is sleeping ...');
 }
 require('./app/helpers/commands')(app);
 require('./app/setups/server')(app);

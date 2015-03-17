@@ -1,0 +1,8 @@
++ copy query trong file app/migrates/_start
+
++ Command : node bin/www [-c [-a [-r [--db]]]]
+
+    + c : active cron job
+    + a : alter database
+    + r : release migrate file
+    + --db : option, server type , mặc định "local" ["local", "xgamedb", "playa"]
