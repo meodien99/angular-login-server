@@ -20,10 +20,10 @@ module.exports = {
     },
     playa : {
         mysql : {
-            host : 'xgamedb.cxtcwijogw46.us-west-2.rds.amazonaws.com',
-            port : 3306,
+            host : '123.31.12.100',
+            port : 7462,
             user : 'root',
-            password : 'mysqlplaya',
+            password : 'playAmYsqlanlon.com',
             database : 'xgamedb'
         }
     }
