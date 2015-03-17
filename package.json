@@ -29,6 +29,7 @@
     "node-mysql": "^0.4.2",
     "passport": "^0.2.1",
     "query-string": "^1.0.0",
-    "serve-favicon": "~2.2.0"
+    "serve-favicon": "~2.2.0",
+    "yargs": "^3.5.4"
   }
 }

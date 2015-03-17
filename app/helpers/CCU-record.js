@@ -1,11 +1,18 @@
 var CronJob = require('cron').CronJob,
     mysql = require('mysql'),
-    mysqlConfig = require('../configs/database').mysql;
-var moment = require('moment-timezone');
+    dbConfig = require('../configs/database');
+var moment = require('moment-timezone'),
+    timezone = require('../configs/moment_time_zone').timezone;
+var yargs = require('yargs').argv;
 
-var connection  = mysql.createConnection(mysqlConfig);
+var __dbConfig = null;
+if(yargs.db && dbConfig[yargs.db]){
+    __dbConfig = yargs.db
+} else {
+    __dbConfig = "local";
+}
 
-
+var connection  = mysql.createConnection(dbConfig[__dbConfig].mysql);
 
 var Record = function(){
     "use strict";
@@ -52,7 +59,7 @@ var Record = function(){
                 WEB : Web,
                 Total : rows.length
             };
-            var time = moment().tz("Asia/Saigon").format().slice(0, 19).replace('T', ' ');
+            var time = moment().tz(timezone).format().slice(0, 19).replace('T', ' ');
             var query = "INSERT INTO ccu_log(`id`,`platform`,`date`,`ccu`) VALUES ";
 
             for(var i in data ){

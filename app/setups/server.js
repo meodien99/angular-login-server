@@ -1,5 +1,4 @@
 var express = require('express');
-var app = express();
 
 var server = function(app){
     var path = require('path');
@@ -10,20 +9,15 @@ var server = function(app){
     var methodOverride = require('method-override');
     var session = require('express-session');
     var cors = require('cors');
-    var mysql = require('mysql');
-    var mysqlConfig = require('../configs/database').mysql;
-    var connection = require('express-myconnection');
     var bcrypt = require('bcrypt-nodejs');
     var multer = require('multer');
     var multer_path = require('../configs/multer_path');
-    var moment = require('moment-timezone');
-    moment.tz("ASIA/SAIGON").format();
-    process.env['JWT_SECRET'] = 'JWTSECRETKEY';
 
-    //setup mysql driven
-    app.use(
-        connection(mysql, mysqlConfig,'request')
-    );
+    process.env['JWT_SECRET'] = 'JWTSECRETKEY'
+
+
+
+
 
     //form-multipart
     app.use(multer(multer_path.pci));

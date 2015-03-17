@@ -1,6 +1,7 @@
 var express = require('express');
 var app = express();
 var CronJob = require('cron').CronJob;
+var yargs = require('yargs').boolean('c').argv;
 
 var Record = require('./app/helpers/CCU-record');
 
@@ -18,7 +19,13 @@ var job = new CronJob({
     start: false,
     timeZone : 'Asia/Saigon'
 });
-//job.start();
+if(yargs.c){
+    console.log('cron job is running ...');
+    job.start();
+} else {
+    console.log('cron job is sleeping ...');
+}
+require('./app/helpers/commands')(app);
 require('./app/setups/server')(app);
 require('./app/setups/routers')(app);
 

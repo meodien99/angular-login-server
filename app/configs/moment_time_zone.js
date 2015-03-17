@@ -1,3 +1,3 @@
-/**
- * Created by madcat on 3/17/15.
- */
+module.exports = {
+    timezone : "ASIA/SAIGON"
+};

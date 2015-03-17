@@ -1,6 +1,8 @@
 var F = require('../helpers/functions'),
     STATUS = require('../helpers/apiStatus'),
-    session = require('express-session');
+    session = require('express-session'),
+    moment = require('moment-timezone'),
+    timezone = require('../configs/moment_time_zone').timezone;
 var messenger = function(){
     "use strict";
 
@@ -53,7 +55,7 @@ var messenger = function(){
                 return F.responseJson(res, err, {});
             var title = (req.body.title == null) ? null : req.body.title;
             var content = (req.body.content == null) ? null : req.body.content;
-            var created_date = (req.body.created_date == null) ? new Date().toISOString().slice(0, 19).replace('T', ' ') : req.body.created_date;
+            var created_date = (req.body.created_date == null) ? new moment().tz(timezone).format().slice(0, 19).replace('T', ' ') : req.body.created_date;
 
             var is_active = 1;
 
