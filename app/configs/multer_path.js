@@ -1,8 +1,8 @@
 module.exports = {
     pci : {
-        dest: __dirname + "/../../public/uploads",
+        dest : __dirname + '/../../public/uploads',
         rename: function (fieldname, filename) {
-            return filename.replace(/\W+/g, '-').toLowerCase() + Date.now()
+            return filename.replace(/\W+/g, '-').toLowerCase() + Date.now();
         }
     }
 };
