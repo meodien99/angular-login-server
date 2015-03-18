@@ -90,6 +90,32 @@ var user = function(){
         });
     };
 
+    self.postUserStatus = function(req, res, next){
+        var username = (req.params.username === null)? null : req.params.username;
+        var status = (req.body.status === null) ? null : req.body.status;
+        if(username == null){
+            return F.responseJson(res, "Username is not empty.", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "UPDATE `xuser` SET `BANNED` = b'" + status + "' WHERE `USER_NAME` = " + connection.escape(username);
+
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                if(rows.length < 1){
+                    return F.responseJson(res, "User not found.", null, STATUS.NOT_FOUND);
+                }
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
     self.resetPassword = function(req, res, next){
         var username = (req.params.username === null ) ? null : req.params.username;
         var nPassword = (req.body.nPassword === null ) ? null : req.body.nPassword;
@@ -128,14 +154,17 @@ var user = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = "SELECT hu.created_date,hu.result,hd.log_content,hr.room_name,x.SHORT_NAME FROM `history_game_room_user` AS hu INNER JOIN `history_game_room_detail` as hd ON hu.history_game_room_detail_id = hd.id INNER JOIN `history_game_room` AS hr ON hd.history_game_room_id= hr.id INNER JOIN `xgame_type` AS x ON hr.xgame_type_id=x.ID WHERE hu.xuser_id=" + connect.escape(userID);
+            var query = "SELECT hu.created_date, hu.result, hd.log_content, x.SHORT_NAME FROM `history_game_room_user` AS hu INNER JOIN `history_game_room_detail` as hd ON hu.history_game_room_detail_id = hd.id INNER JOIN `history_game_room` AS hr ON hd.history_game_room_id= hr.id INNER JOIN `xgame_type` AS x ON hr.xgame_type_id=x.ID WHERE hu.xuser_id=" + connect.escape(userID) + "ORDER BY hu.created_date DESC LIMIT 50";
 
             connect.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
 
                 rows.forEach(function(row, index){
-                   row.log_content = row.log_content.start.pl;
+                    var regEx = /([a-zA-Z_]){1}(\w{4,}(?!\{un\:))/ig;
+                    var names = row.log_content.split("start:")[1].split(";")[0].match(regEx);
+                    delete row.log_content;
+                    row.usersPlayed = names.join(", ");
                 });
 
                 return F.responseJson(res, null , rows, STATUS.OK);

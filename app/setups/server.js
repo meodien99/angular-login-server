@@ -13,7 +13,7 @@ var server = function(app){
     var multer = require('multer');
     var multer_path = require('../configs/multer_path');
 
-    process.env['JWT_SECRET'] = 'JWTSECRETKEY'
+    process.env['JWT_SECRET'] = 'JWTSECRETKEY';
 
 
 

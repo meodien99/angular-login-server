@@ -65,7 +65,7 @@ var statistic = function(){
                 return F.responseJson(res, err, {});
 
             var query = "SELECT u.xgame_type_id as type_id,g.NAME as name,(sum(won)+sum(loss)+sum(draw)+sum(quit)) as amount FROM `xuser_game_data_daily` as u LEFT JOIN xgame_type as g ON g.id=u.xgame_type_id LEFT JOIN xuser as xu ON u.xuser_id=xu.id WHERE ((u.track_date BETWEEN DATE_SUB(NOW(), INTERVAL "+ parseInt(time) +" "+ t.toUpperCase() +") AND NOW()) AND g.visible=1 AND xu.is_ai=(0)) group by u.xgame_type_id";
-            console.log(query);
+            //console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
