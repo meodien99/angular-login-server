@@ -1,7 +1,10 @@
+process.env['db_default'] = 'playa';
+process.env['run_cronjob'] = 'true';
+
 var express = require('express');
 var app = express();
 var CronJob = require('cron').CronJob;
-var yargs = require('yargs').boolean('c').argv;
+var yargs = require('yargs').argv;
 
 var Record = require('./app/helpers/CCU-record');
 
@@ -19,7 +22,15 @@ var job = new CronJob({
     start: false,
     timeZone : 'Asia/Saigon'
 });
-if(yargs.c){
+
+var __cronJob = null;
+if(typeof yargs.c !== "undefined"){
+    __cronJob = yargs.c
+} else {
+    __cronJob = process.env.run_cronjob;
+}
+//
+if(__cronJob == 'true'){
     console.log('cron job is running ...');
     job.start();
 }

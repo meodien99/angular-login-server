@@ -17,7 +17,7 @@ var CMD = function(app){
     if(yargs.db && dbConfig[yargs.db]){
         __dbConfig = yargs.db
     } else {
-        __dbConfig = "local";
+        __dbConfig = process.env.db_default;
     }
 
     var mysql_mysql = dbConfig[__dbConfig].mysql;

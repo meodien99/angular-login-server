@@ -9,7 +9,7 @@ var __dbConfig = null;
 if(yargs.db && dbConfig[yargs.db]){
     __dbConfig = yargs.db
 } else {
-    __dbConfig = "local";
+    __dbConfig = process.env.db_default;
 }
 
 var connection  = mysql.createConnection(dbConfig[__dbConfig].mysql);

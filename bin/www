@@ -13,6 +13,8 @@ var fs = require('fs');
 /**
  * Get port from environment and store in Express.
  */
+//process.env['db_default'] = 'playa';
+//process.env['run_cronjob'] = 'true';
 var port = normalizePort(process.env.PORT || '3769');
 app.set('port', port);
 

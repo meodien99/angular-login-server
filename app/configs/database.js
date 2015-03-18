@@ -26,6 +26,15 @@ module.exports = {
             password : 'playAmYsqlanlon.com',
             database : 'xgamedb'
         }
+    },
+    sfun : {
+        mysql : {
+            host : '123.31.12.100',
+            port : 7462,
+            user : 'root',
+            password : 'playAmYsqlanlon.com',
+            database : 'xgamedb'
+        }
     }
     /*'mysql' : {
      host: '123.30.189.189',
