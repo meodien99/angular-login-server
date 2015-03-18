@@ -116,6 +116,33 @@ var user = function(){
         });
     };
 
+    //user log
+    self.getUserLog = function(req, res, next){
+        var userID = (req.params.userID === null ) ? null : req.params.userID;
+
+        if(userID === null){
+            return F.responseJson(res, "Password is required.", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connect){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "SELECT hu.created_date,hu.result,hd.log_content,hr.room_name,x.SHORT_NAME FROM `history_game_room_user` AS hu INNER JOIN `history_game_room_detail` as hd ON hu.history_game_room_detail_id = hd.id INNER JOIN `history_game_room` AS hr ON hd.history_game_room_id= hr.id INNER JOIN `xgame_type` AS x ON hr.xgame_type_id=x.ID WHERE hu.xuser_id=" + connect.escape(userID);
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                rows.forEach(function(row, index){
+                   row.log_content = row.log_content.start.pl;
+                });
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
     /* *
      * ============================== ADMIN USER =========================================
      * */
@@ -239,6 +266,24 @@ var user = function(){
             });
         });
     };
+
+
+    //admin log
+    self.getAdminLog = function(req, res, next){
+        req.getConnection(function(err, connect){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "SELECT * FROM `user_log` ORDER BY time DESC";
+
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null, rows, STATUS.OK);
+            });
+        });
+    }
 };
 
 module.exports = user;

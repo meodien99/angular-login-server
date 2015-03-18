@@ -1,6 +1,3 @@
-var express = require('express');
-var app = express();
-
 var CMD = function(app){
 
     var yargs = require('yargs').boolean('r').boolean('a').argv,
@@ -75,7 +72,7 @@ var CMD = function(app){
                                 });
                             });
                         } else {
-                            console.log("Every thing is up-to-date !")
+                            console.log("Everything is up-to-date !")
                         }
                     });
                 });
