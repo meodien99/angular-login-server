@@ -35,7 +35,7 @@ var routers = function(app){
     //# /login
     app.use('/', authen);
     //# /users
-    app.use('/users', ensureAuthorized, users);
+    app.use('/users', users);
     //# /*statistic
     app.use('/', ensureAuthorized, statistic);
     //# /message/*
