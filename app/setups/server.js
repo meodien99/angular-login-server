@@ -17,9 +17,6 @@ var server = function(app){
 
 
 
-
-
-
     //form-multipart
     app.use(multer(multer_path.pci));
 
