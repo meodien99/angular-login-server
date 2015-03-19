@@ -148,7 +148,7 @@ module.exports = {
             if(err)
                 console.log(err);
 
-            console.log(rows);
+            //console.log(rows);
         });
     }
 };

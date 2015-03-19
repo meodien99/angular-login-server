@@ -176,10 +176,25 @@ var user = function(){
      * ============================== ADMIN USER =========================================
      * */
 
-    self.getAllAdmin = function(req, res, next){
+    self.getAllAdmins = function(req, res, next){
         var username = jwt.verify(req.token, process.env.JWT_SECRET).email;
         req.getConnection(function(err, connect){
             var query = "SELECT * FROM `xadmin` INNER JOIN `admin_roles` ON `xadmin`.`role_id` = `admin_roles`.`id` WHERE `xadmin`.`username` !="+connect.escape(username) ;
+            //console.log(query);
+            connect.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.getAdmin = function(req, res, next){
+        var adminUser = (req.params.adminUser === null ) ? null : req.params.adminUser;
+
+        req.getConnection(function(err, connect){
+            var query = "SELECT * FROM `xadmin` INNER JOIN `admin_roles` ON `xadmin`.`role_id` = `admin_roles`.`id` WHERE `xadmin`.`username` ="+connect.escape(adminUser) ;
             //console.log(query);
             connect.query(query, function(err, rows){
                 if(err)
@@ -207,7 +222,7 @@ var user = function(){
 
         req.getConnection(function(err, connect){
             var query = "UPDATE `xadmin` SET `password` = \"" + password + "\", `verificationToken` = \"" + code + "\" WHERE `username`= " + connect.escape(adminUser);
-
+            console.log(query);
             connect.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -221,7 +236,7 @@ var user = function(){
 
     self.putChangePermission = function(req, res, next){
         var adminUser = (req.params.adminUser === null ) ? null : req.params.adminUser;
-        var role_id = (req.body.role_id === null ) ? null : req.body.role;
+        var role_id = (req.body.role_id === null ) ? null : req.body.role_id;
 
         if(role_id == null){
             return F.responseJson(res, "role ID is required", {}, STATUS.BAD_REQUEST);
@@ -229,7 +244,7 @@ var user = function(){
 
         req.getConnection(function(err, connect){
             var query = "UPDATE `xadmin` SET `role_id`= " + connect.escape(role_id) + " WHERE `username`= " + connect.escape(adminUser);
-
+            console.log(query);
             connect.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});

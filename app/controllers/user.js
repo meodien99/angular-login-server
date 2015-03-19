@@ -10,12 +10,13 @@ router
     .get('/feedback', userRepo.getFeedback.bind(userRepo))
     .post('/find', userRepo.postFindUser.bind(userRepo))
     //admin
-    .get('/admin', userRepo.getAllAdmin.bind(userRepo))
+    .get('/admin', userRepo.getAllAdmins.bind(userRepo))
     .post('/admin', userRepo.postAddAdminUser.bind(userRepo))
     //admin logs
     .get('/admin/logs', userRepo.getAdminLog.bind(userRepo))
     .put('/admin/:adminUser/changePermission', userRepo.putChangePermission.bind(userRepo))
     .post('/admin/:adminUser/changePassword', userRepo.postResetPassAdmin.bind(userRepo))
+    .get('/admin/:adminUser', userRepo.getAdmin.bind(userRepo))
     .delete('/admin/:adminUser', userRepo.deleteAdminUser.bind(userRepo))
     //user reset password
     .post('/:username/change', userRepo.resetPassword.bind(userRepo))
