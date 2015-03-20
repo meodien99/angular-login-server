@@ -40,7 +40,6 @@ var payment = function(){
                 return F.responseJson(res, err, {});
             //var query = "SELECT xcard_user_charge.SERIAL, xcard_user_charge.CODE, xcard_user_charge.CHARGE_TIME, xuser.USER_NAME, xtelco.NAME, xcard_user_charge.error FROM xcard_user_charge INNER JOIN xuser ON xcard_user_charge.XUSER_ID = xuser.ID INNER JOIN xtelco ON xcard_user_charge.TELCO_ID = xtelco.ID WHERE (xcard_user_charge.ID > 13300";
             var query = "SELECT * FROM xsms_user_charge_raw WHERE (xsms_user_charge_raw.created_datetime BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +")";
-            //var query = "SELECT xcard_user_charge.`SERIAL`, xcard_user_charge.`CODE`, xcard_user_charge.`CHARGE_TIME`, `xuser`.`USER_NAME`, `xtelco`.`NAME`, `xcard_user_charge`.`error` FROM `xcard_user_charge` INNER JOIN `xuser` ON `xcard_user_charge`.`XUSER_ID` = xuser.`ID` INNER JOIN `xtelco` ON `xcard_user_charge`.`TELCO_ID` = `xtelco`.`ID` WHERE (xcard_user_charge.CHARGE_TIME BETWEEN \""+ from +"\" AND \""+ to +"\")";
 
             connection.query(query, function(err, tasks){
                 if(err)
@@ -59,9 +58,7 @@ var payment = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            //var query = "SELECT xcard_user_charge.SERIAL, xcard_user_charge.CODE, xcard_user_charge.CHARGE_TIME, xuser.USER_NAME, xtelco.NAME, xcard_user_charge.error FROM xcard_user_charge INNER JOIN xuser ON xcard_user_charge.XUSER_ID = xuser.ID INNER JOIN xtelco ON xcard_user_charge.TELCO_ID = xtelco.ID WHERE (xcard_user_charge.ID > 13300";
             var query = "SELECT u1.`USER_NAME` AS name1, u2.`USER_NAME` AS name2 , `xb`.`reason`,  xb.`xcoin`, xb.`xgold`, xb.`transfer_time` FROM xbank_transfer xb INNER JOIN `xuser` u1 ON xb.xuser_id = u1.id INNER JOIN `xuser` u2 ON xb.to_xuser_id = u2.id WHERE  (xb.transfer_time BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY `xb`.`transfer_time` DESC;";
-            //var query = "SELECT xcard_user_charge.`SERIAL`, xcard_user_charge.`CODE`, xcard_user_charge.`CHARGE_TIME`, `xuser`.`USER_NAME`, `xtelco`.`NAME`, `xcard_user_charge`.`error` FROM `xcard_user_charge` INNER JOIN `xuser` ON `xcard_user_charge`.`XUSER_ID` = xuser.`ID` INNER JOIN `xtelco` ON `xcard_user_charge`.`TELCO_ID` = `xtelco`.`ID` WHERE (xcard_user_charge.CHARGE_TIME BETWEEN \""+ from +"\" AND \""+ to +"\")";
 
             connection.query(query, function(err, tasks){
                 if(err)
