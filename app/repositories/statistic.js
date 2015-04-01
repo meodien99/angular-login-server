@@ -17,7 +17,7 @@ var statistic = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var selectQuery = "SELECT u.USER_NAME,u.CALL_NUMBER, u.REGISTERED_DATE, u.last_login_time,u.current_xclient_type, u.xclient_type, u.FACEBOOK_ID, u.xcoin, u.TOTAL_NUM_WON, u.TOTAL_NUM_DRAW, u.TOTAL_NUM_LOSS, u.TOTAL_NUM_QUIT FROM xuser u  WHERE (u.REGISTERED_DATE BETWEEN \""+ from +"\" AND \""+ to +"\");";
+            var selectQuery = "SELECT u.USER_NAME,u.CALL_NUMBER, u.REGISTERED_DATE, u.last_login_time,u.current_xclient_type, u.xclient_type, u.FACEBOOK_ID, u.xcoin, u.TOTAL_NUM_WON, u.TOTAL_NUM_DRAW, u.TOTAL_NUM_LOSS, u.TOTAL_NUM_QUIT FROM xuser u  WHERE (u.REGISTERED_DATE BETWEEN \""+ from +"\" AND \""+ to +"\" and u.is_ai=(0));";
 
             connection.query(selectQuery, function(err, rows){
                 if(err){
