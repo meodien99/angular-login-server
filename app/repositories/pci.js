@@ -291,8 +291,8 @@ var PCI = function(){
 
             var name = (req.body.name == null) ? null : req.body.name;
             var description = (req.body.description == null) ? null : req.body.description;
-            var eDate = (req.body.eDate == null) ? null : req.body.eDate.replace('Z','').replace('"','').replace('T', ' ');
-            var sDate = (req.body.sDate == null) ? null : req.body.sDate.replace('Z','').replace('"','').replace('T', ' ');
+            var eDate = (req.body.eDate == null) ? null : req.body.eDate;
+            var sDate = (req.body.sDate == null) ? null : req.body.sDate;
             var offerID = (req.body.offerID == null) ? null : req.body.offerID;
             var platform = (req.body.platform == null) ? null : req.body.platform;
             var coins = (req.body.coins == null) ? null : req.body.coins;
@@ -346,8 +346,8 @@ var PCI = function(){
                 return F.responseJson(res, err, {});
             var name = (req.body.name == null) ? null : req.body.name;
             var description = (req.body.description == null) ? null : req.body.description;
-            var eDate = (req.body.eDate == null) ? null : req.body.eDate.replace('Z','').replace('"','').replace('T', ' ');
-            var sDate = (req.body.sDate == null) ? null : req.body.sDate.replace('Z','').replace('"','').replace('T', ' ');
+            var eDate = (req.body.eDate == null) ? null : req.body.eDate;
+            var sDate = (req.body.sDate == null) ? null : req.body.sDate;
             var offerID = (req.body.offerID == null) ? null : req.body.offerID;
             var platform = (req.body.platform == null) ? null : req.body.platform;
             var coins = (req.body.coins == null) ? null : req.body.coins;
