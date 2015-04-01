@@ -18,8 +18,9 @@ var payment = function(){
                 return F.responseJson(res, err, {});
 
             //var query = "SELECT `xuser`.`USER_NAME`  FROM `xcharge_history` INNER JOIN xuser ON xuser.`ID` = `xcharge_history`.`XUSER_ID` INNER JOIN `xcard_user_charge` ON `xcharge_history`.`XCARD_CHARGE_ID`=`xcard_user_charge`.`ID` WHERE (xcharge_history.DATE_TIME BETWEEN \""+ from +"\" AND \""+ to +"\") AND `xcharge_history`.`XCARD_CHARGE_ID` >0;";
-            var query = "SELECT `xuser`.`USER_NAME`, `xuser`.`current_xclient_type`, `xcharge_history`.`DATE_TIME`, `xcharge_history`.`MONEY`, `xcharge_history`.`BALANCE`, `xcharge_history`.`xgold`, `xcard_user_charge`.`SERIAL`, `xcard_user_charge`.`CODE`, `xcard_user_charge`.`TELCO_ID` FROM `xcharge_history` INNER JOIN xuser ON xuser.`ID` = `xcharge_history`.`XUSER_ID` INNER JOIN `xcard_user_charge` ON `xcharge_history`.`XCARD_CHARGE_ID`=`xcard_user_charge`.`ID` WHERE (xcharge_history.DATE_TIME BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") AND `xcharge_history`.`XCARD_CHARGE_ID` >0 ORDER BY `xcharge_history`.`DATE_TIME` DESC;;";
+            var query = "SELECT `xuser`.`USER_NAME`, `xuser`.`current_xclient_type`, `xcharge_history`.`DATE_TIME`, `xcharge_history`.`MONEY`, `xcharge_history`.`BALANCE`,  `xcard_user_charge`.`SERIAL`, `xcard_user_charge`.`CODE`, `xcard_user_charge`.`TELCO_ID` FROM `xcharge_history` INNER JOIN xuser ON xuser.`ID` = `xcharge_history`.`XUSER_ID` INNER JOIN `xcard_user_charge` ON `xcharge_history`.`XCARD_CHARGE_ID`=`xcard_user_charge`.`ID` WHERE (xcharge_history.DATE_TIME BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") AND `xcharge_history`.`XCARD_CHARGE_ID` >0 ORDER BY `xcharge_history`.`DATE_TIME` DESC;;";
 
+            console.log(query);
             connection.query(query, function(err, tasks){
                 if(err){
                     console.log("ERROR: get card by time " + err)
@@ -58,7 +59,7 @@ var payment = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            var query = "SELECT u1.`USER_NAME` AS name1, u2.`USER_NAME` AS name2 , `xb`.`reason`,  xb.`xcoin`, xb.`xgold`, xb.`transfer_time` FROM xbank_transfer xb INNER JOIN `xuser` u1 ON xb.xuser_id = u1.id INNER JOIN `xuser` u2 ON xb.to_xuser_id = u2.id WHERE  (xb.transfer_time BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY `xb`.`transfer_time` DESC;";
+            var query = "SELECT u1.`USER_NAME` AS name1, u2.`USER_NAME` AS name2 , `xb`.`reason`,  xb.`xcoin`, xb.`transfer_time` FROM xbank_transfer xb INNER JOIN `xuser` u1 ON xb.xuser_id = u1.id INNER JOIN `xuser` u2 ON xb.to_xuser_id = u2.id WHERE  (xb.transfer_time BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY `xb`.`transfer_time` DESC;";
 
             connection.query(query, function(err, tasks){
                 if(err)
