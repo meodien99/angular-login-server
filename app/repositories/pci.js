@@ -5,15 +5,6 @@ var querystring = require('query-string');
 var image = require('easyimage');
 var http = require('http');
 
-
-function fnAppend(fn, insert) {
-    var arr = fn.split('.');
-    var ext = arr.pop();
-    insert = (insert !== undefined) ? insert : new Date().getTime();
-    return arr + '.' + insert + '.' + ext;
-}
-
-
 var PCI = function(){
     "use strict";
 
@@ -315,7 +306,7 @@ var PCI = function(){
 
             image.resize({
                 src : file.path,
-                dst : fnAppend(file.path,'thumb'),
+                dst : F.fnAppend(file.path,'thumb'),
                 width : 100,
                 height : 100
             }, function(err ,image, error){
@@ -323,7 +314,7 @@ var PCI = function(){
                     return F.responseJson(res, err, {});
             });
 
-            var icon = '/public/uploads/' + fnAppend(file.name, 'thumb');
+            var icon = '/public/uploads/' + F.fnAppend(file.name, 'thumb');
             var query = "INSERT INTO `apps` (`id`, `name`, `icon`, `description`, `eDate`, `sDate`, `platform`, `offerid`, `coins`, `gems`) VALUES (NULL, \'"+ name +"\', \'" + icon + "\', \'"+ description +"\', \'"+ eDate +"\', \'"+ sDate +"\', \'"
                 + platform + "\', \'" + offerID + "\', \'" + coins + "\'," + connection.escape(gems) + ")";
 
@@ -353,7 +344,7 @@ var PCI = function(){
             var coins = (req.body.coins == null) ? null : req.body.coins;
             var gems = (req.body.gems == null) ? null : req.body.gems;
 
-            console.log(eDate);
+            //console.log(eDate);
             if(name == null || description == null || eDate == null ||  sDate == null || offerID == null || platform == null || coins == null || gems == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
@@ -369,14 +360,14 @@ var PCI = function(){
                 }
                 image.resize({
                     src : file.path,
-                    dst : fnAppend(file.path,'thumb'),
+                    dst : F.fnAppend(file.path,'thumb'),
                     width : 100,
                     height : 100
                 }, function(err ,image, error){
                     if(err)
                         return F.responseJson(res, err, {});
                 });
-                var icon = '/public/uploads/' + fnAppend(file.name, 'thumb');
+                var icon = '/public/uploads/' + F.fnAppend(file.name, 'thumb');
                 query += ", `icon`=\'" + icon + "\' WHERE `id`=\'"+ req.params.id +"\'";
             } else {
                 //console.log(2);

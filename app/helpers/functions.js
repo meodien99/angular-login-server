@@ -150,5 +150,11 @@ module.exports = {
 
             //console.log(rows);
         });
+    },
+    fnAppend : function (fn, insert) {
+        var arr = fn.split('.');
+        var ext = arr.pop();
+        insert = (insert !== undefined) ? insert : new Date().getTime();
+        return arr + '.' + insert + '.' + ext;
     }
 };
