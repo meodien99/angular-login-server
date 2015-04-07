@@ -202,9 +202,7 @@ var messenger = function(){
             var content = (req.body.content == null) ? null : req.body.content;
             var type = (req.body.type == null) ? null : req.body.type;
 
-            console.log("tt " + title);
-            console.log("c " + content);
-            console.log("t " + type);
+            
             if(title == null || content == null || type == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
