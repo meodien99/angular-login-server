@@ -147,7 +147,7 @@ var messenger = function(){
         });
     };
 
-    self.createXMessage = function(){
+    self.createXMessage = function(req, res, next){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
@@ -184,8 +184,9 @@ var messenger = function(){
             var icon = '/public/uploads/' + F.fnAppend(file.name, 'thumb');
 
             var query = "INSERT INTO `xgame_system_message` (`id`, `title`, `content`, `image`,`created_date`, `is_active`, `type`) VALUES (NULL, "+ connection.escape(title) +", "+ connection.escape(content)
-                + ", " + icon + ", \'"+ created_date +"\', \'"+ is_active +"\'," + connection.escape(type) + ")";
+                + ", " + connection.escape(icon) + ", \'"+ created_date +"\', \'"+ is_active +"\'," + connection.escape(type) + ")";
 
+            console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -201,6 +202,9 @@ var messenger = function(){
             var content = (req.body.content == null) ? null : req.body.content;
             var type = (req.body.type == null) ? null : req.body.type;
 
+            console.log("tt " + title);
+            console.log("c " + content);
+            console.log("t " + type);
             if(title == null || content == null || type == null )
                 return F.responseJson(res, "Field not empty", {}, STATUS.BAD_REQUEST);
 
@@ -223,12 +227,18 @@ var messenger = function(){
                         return F.responseJson(res, err, {});
                 });
                 var icon = '/public/uploads/' + F.fnAppend(file.name, 'thumb');
-                query += ", `image`=\'" + icon + "\' WHERE `id`=\'"+ req.params.id +"\'";
+                query += ", `image`=" + connection.escape(icon) + " WHERE `id`=\'"+ req.params.id +"\'";
             } else {
                 //console.log(2);
-
                 query += " WHERE `id`=\'"+ req.params.id +"\'";
             }
+
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                return F.responseJson(res, null, rows, STATUS.CREATED);
+            });
         });
     };
 
@@ -238,7 +248,7 @@ var messenger = function(){
                 return F.responseJson(res, err, {});
             var id = req.params.id;
             var query = "DELETE FROM `xgame_system_message` WHERE `id`="+id;
-
+            //console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});

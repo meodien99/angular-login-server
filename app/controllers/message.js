@@ -14,7 +14,7 @@ router
     .get('/msg/:id', messageRepo.getOneXMessage.bind(messageRepo))
     .post('/msg', messageRepo.createXMessage.bind(messageRepo))
     .put('/msg/:id', messageRepo.updateXMessage.bind(messageRepo))
-    .delete('/msg/:id', messageRepo.deleteMessage.bind(messageRepo))
+    .delete('/msg/:id', messageRepo.deleteXMessage.bind(messageRepo))
 ;
 
 module.exports = router;
