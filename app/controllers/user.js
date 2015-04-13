@@ -20,6 +20,7 @@ router
     .delete('/admin/:adminUser', userRepo.deleteAdminUser.bind(userRepo))
     //user reset password
     .post('/:username/change', userRepo.resetPassword.bind(userRepo))
+    .put('/:username/addCoin', userRepo.putUserCoin.bind(userRepo))
     .post('/:username/status', userRepo.postUserStatus.bind(userRepo))
     .get('/:userID/logs', userRepo.getUserLog.bind(userRepo));
 

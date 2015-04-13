@@ -1,6 +1,6 @@
 var F = require('../helpers/functions'),
     STATUS = require('../helpers/apiStatus'),
-    bcrypt = require('bcrypt-nodejs')
+    bcrypt = require('bcrypt-nodejs'),
     jwt = require('jsonwebtoken');
 
 var user = function(){
@@ -22,8 +22,8 @@ var user = function(){
     };
 
     self.getCCU = function(req, res, next){
-        var from = (req.query.from === null) ? null : req.query.from.replace('"','').replace('T',' ').slice(0,19);
-        var to = (req.query.to === null) ? null : req.query.to.replace('"','').replace('T',' ').slice(0,19);
+        var from = (req.query.from === null) ? null : req.query.from;
+        var to = (req.query.to === null) ? null : req.query.to;
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
@@ -41,8 +41,9 @@ var user = function(){
     };
 
     self.getFeedback = function(req, res, next){
-        var from = (req.query.from === null)  ? null : req.query.from.replace('"','').replace('T',' ').slice(0,19);
-        var to = (req.query.to === null) ? null : req.query.to.replace('"','').replace('T',' ').slice(0,19);
+        var from = (req.query.from === null)  ? null : req.query.from;
+        var to = (req.query.to === null) ? null : req.query.to;
+
         if(from == null || to == null){
             return F.responseJson(res, "Start date or End date must be filled.", {}, STATUS.BAD_REQUEST);
         }
@@ -50,7 +51,7 @@ var user = function(){
             if(err)
                 return F.responseJson(res, err, {});
             var query = "SELECT f.`id`, f.`user_name`, f.`created_date`, f.`content`, `xuser`.`xclient_type` FROM user_feedback f INNER JOIN `xuser` ON  f.`user_name` = `xuser`.`USER_NAME` WHERE (created_date BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY f.id DESC;";
-            //console.log(query);
+            console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -110,6 +111,13 @@ var user = function(){
                 if(rows.length < 1){
                     return F.responseJson(res, "User not found.", null, STATUS.NOT_FOUND);
                 }
+                var type ;
+                if(status == 0){
+                    type = "active";
+                } else {
+                    type = "banned";
+                }
+                F.logger(connection, req, "Change status " + username + " to " + type);
 
                 return F.responseJson(res, null , rows, STATUS.OK);
             });
@@ -166,6 +174,41 @@ var user = function(){
                     delete row.log_content;
                     row.usersPlayed = names.join(", ");
                 });
+
+                return F.responseJson(res, null , rows, STATUS.OK);
+            });
+        });
+    };
+
+    self.putUserCoin = function(req, res, next){
+        var username = (req.params.username === null)? null : req.params.username;
+        var coin = (req.body.coin === null) ? null : req.body.coin;
+        coin = parseInt(coin);
+
+        if(username == null){
+            return F.responseJson(res, "Username is not empty.", {}, STATUS.BAD_REQUEST);
+        }
+
+        if(isNaN(coin) || coin < 0){
+            return F.responseJson(res, "Coin number is not valid", {}, STATUS.BAD_REQUEST);
+        }
+
+        req.getConnection(function(err, connection){
+            if(err)
+                return F.responseJson(res, err, {});
+
+            var query = "UPDATE `xuser` SET `xcoin` = " + connection.escape(coin) + " WHERE `USER_NAME` = " + connection.escape(username);
+
+            connection.query(query, function(err, rows){
+                if(err)
+                    return F.responseJson(res, err, {});
+
+                if(rows.length < 1){
+                    return F.responseJson(res, "User not found.", null, STATUS.NOT_FOUND);
+                }
+
+                //log
+                F.logger(connection, req, "Add coin to user " + username + " : " + coin);
 
                 return F.responseJson(res, null , rows, STATUS.OK);
             });
