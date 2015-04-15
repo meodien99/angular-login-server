@@ -17,7 +17,7 @@ var statistic = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var selectQuery = "SELECT u.USER_NAME,u.CALL_NUMBER, u.REGISTERED_DATE, u.last_login_time,u.current_xclient_type, u.xclient_type, u.FACEBOOK_ID, u.xcoin, u.TOTAL_NUM_WON, u.TOTAL_NUM_DRAW, u.TOTAL_NUM_LOSS, u.TOTAL_NUM_QUIT FROM xuser u  WHERE (u.REGISTERED_DATE BETWEEN \""+ from +"\" AND \""+ to +"\" and u.is_ai=(0));";
+            var selectQuery = "SELECT u.*, `xuser_game_data`.`played_time`/3600 AS played_time FROM `xuser` u INNER JOIN `xuser_game_data` ON u.`ID` = `xuser_game_data`.`xuser_id`  WHERE `xuser_game_data`.`xgame_type_id`=12 AND (u.REGISTERED_DATE BETWEEN \""+ from +"\" AND \""+ to +"\" and u.is_ai=(0));";
 
             connection.query(selectQuery, function(err, rows){
                 if(err){
@@ -40,7 +40,7 @@ var statistic = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var selectQuery = "SELECT u.USER_NAME, u.CALL_NUMBER, u.REGISTERED_DATE, u.last_login_time, u.current_xclient_type,u.xclient_type, u.FACEBOOK_ID, u.xcoin FROM xuser u  WHERE (u.last_login_time BETWEEN \""+ from +"\" AND \""+ to +"\" and u.is_ai=(0));";
+            var selectQuery = "SELECT u.*, `xuser_game_data`.`played_time`/3600 AS played_time FROM `xuser` u INNER JOIN `xuser_game_data` ON u.`ID` = `xuser_game_data`.`xuser_id`  WHERE `xuser_game_data`.`xgame_type_id`=12 AND (u.last_login_time BETWEEN \""+ from +"\" AND \""+ to +"\" and u.is_ai=(0));";
 
             connection.query(selectQuery, function(err, rows){
                 if(err){

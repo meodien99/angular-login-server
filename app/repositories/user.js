@@ -12,7 +12,7 @@ var user = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            var query = 'SELECT id,USER_NAME,IS_ONLINE,last_login_time,current_xclient_type,REGISTERED_DATE FROM xuser WHERE is_online=(1) and is_ai=(0)';
+            var query = 'SELECT u.*, `xuser_game_data`.`played_time`/3600 AS played_time FROM `xuser` u INNER JOIN `xuser_game_data` ON u.`ID` = `xuser_game_data`.`xuser_id`  WHERE `xuser_game_data`.`xgame_type_id`=12 AND u.is_online=(1) and u.is_ai=(0)';
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});
@@ -76,7 +76,7 @@ var user = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = "SELECT * FROM `xuser` WHERE `USER_NAME` = " + connection.escape(username);
+            var query = "SELECT  `xuser`.*, `xuser_game_data`.`played_time`/3600 AS played_time FROM `xuser` INNER JOIN `xuser_game_data` ON `xuser`.`ID` = `xuser_game_data`.`xuser_id` WHERE `xuser_game_data`.`xgame_type_id`=12 AND `USER_NAME` = " + connection.escape(username);
 
             connection.query(query, function(err, rows){
                 if(err)
