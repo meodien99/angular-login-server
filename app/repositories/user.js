@@ -162,7 +162,7 @@ var user = function(){
             if(err)
                 return F.responseJson(res, err, {});
 
-            var query = "SELECT hu.created_date, hu.result, hd.log_content, x.SHORT_NAME FROM `history_game_room_user` AS hu INNER JOIN `history_game_room_detail` as hd ON hu.history_game_room_detail_id = hd.id INNER JOIN `history_game_room` AS hr ON hd.history_game_room_id= hr.id INNER JOIN `xgame_type` AS x ON hr.xgame_type_id=x.ID WHERE hu.xuser_id=" + connect.escape(userID) + "ORDER BY hu.created_date DESC LIMIT 50";
+            var query = "SELECT hu.created_date, hu.result, hu.money, hd.log_content, x.SHORT_NAME FROM `history_game_room_user` AS hu INNER JOIN `history_game_room_detail` as hd ON hu.history_game_room_detail_id = hd.id INNER JOIN `history_game_room` AS hr ON hd.history_game_room_id= hr.id INNER JOIN `xgame_type` AS x ON hr.xgame_type_id=x.ID WHERE hu.xuser_id=" + connect.escape(userID) + "ORDER BY hu.created_date DESC LIMIT 500";
 
             connect.query(query, function(err, rows){
                 if(err)
