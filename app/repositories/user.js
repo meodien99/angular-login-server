@@ -171,8 +171,9 @@ var user = function(){
                 rows.forEach(function(row, index){
                     var regEx = /([a-zA-Z_]){1}(\w{4,}(?!\{un\:))/ig;
                     var names = row.log_content.split("start:")[1].split(";")[0].match(regEx);
-                    delete row.log_content;
-                    row.usersPlayed = names.join(", ");
+                    //delete row.log_content;
+                    if(names !== null)
+                        row.usersPlayed = names.join(", ");
                 });
 
                 return F.responseJson(res, null , rows, STATUS.OK);
