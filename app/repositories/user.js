@@ -103,7 +103,7 @@ var user = function(){
                 return F.responseJson(res, err, {});
 
             var query = "UPDATE `xuser` SET `BANNED` = b'" + status + "' WHERE `USER_NAME` = " + connection.escape(username);
-
+            console.log(query);
             connection.query(query, function(err, rows){
                 if(err)
                     return F.responseJson(res, err, {});

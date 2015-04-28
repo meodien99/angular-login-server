@@ -59,7 +59,8 @@ var payment = function(){
         req.getConnection(function(err, connection){
             if(err)
                 return F.responseJson(res, err, {});
-            var query = "SELECT u1.`USER_NAME` AS name1, u2.`USER_NAME` AS name2 , `xb`.`reason`,  xb.`xcoin`, xb.`transfer_time` FROM xbank_transfer xb INNER JOIN `xuser` u1 ON xb.xuser_id = u1.id INNER JOIN `xuser` u2 ON xb.to_xuser_id = u2.id WHERE  (xb.transfer_time BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY `xb`.`transfer_time` DESC;";
+            //var query = "SELECT u1.`USER_NAME` AS name1, u2.`USER_NAME` AS name2 , `xb`.`reason`,  `xb`.`xcoin`, `xb`.`transfer_time` FROM xbank_transfer xb INNER JOIN `xuser` u1 ON xb.xuser_id = u1.id INNER JOIN `xuser` u2 ON xb.to_xuser_id = u2.id WHERE  (xb.transfer_time BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY `xb`.`transfer_time` DESC;";
+            var query = "SELECT u1.`USER_NAME` AS name1, u2.`USER_NAME` AS name2 , `xb`.`reason`, `xb`.`transfer_time` FROM xbank_transfer xb INNER JOIN `xuser` u1 ON xb.xuser_id = u1.id INNER JOIN `xuser` u2 ON xb.to_xuser_id = u2.id WHERE  (xb.transfer_time BETWEEN "+ connection.escape(from) +" AND "+ connection.escape(to) +") ORDER BY `xb`.`transfer_time` DESC;";
 
             connection.query(query, function(err, tasks){
                 if(err)
