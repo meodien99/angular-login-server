@@ -10,7 +10,8 @@ var routers = function(app){
         event = require('../controllers/event'),
         authen = require('../controllers/authen'),
         messages = require('../controllers/message'),
-        pci = require('../controllers/pci');
+        pci = require('../controllers/pci'),
+        xinvite = require('../controllers/xinvite_event');
    /* app.get('/yolo', IsAuthenticated, function(req, res, next){
         console.log(req.user);
         res.json({ok:200});
@@ -34,6 +35,8 @@ var routers = function(app){
     app.use('/', pci);
     //# /login
     app.use('/', authen);
+    //# /events/xinvite
+    app.use('/events', xinvite);
     //# /users
     app.use('/users',ensureAuthorized , users);
     //# /*statistic
