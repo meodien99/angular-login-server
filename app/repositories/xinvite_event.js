@@ -21,8 +21,9 @@ var xInvite = function(){
         });
     };
 
-    self.postUserInfo = function(req, res, next){
-        var username = (req.body.username === null) ? null : req.body.username;
+    self.getUserInfo = function(req, res, next){
+        var username = (req.params.username === null) ? null : req.params.username;
+        console.log(123);
         if(username == null){
             return F.responseJson(res, "Username must not empty", {}, STATUS.BAD_REQUEST);
         }

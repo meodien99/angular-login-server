@@ -6,7 +6,7 @@ var xInvite = new XInviteRepository();
 
 router
     .get('/xinvite', xInvite.getTopTenInfo.bind(xInvite))
-    .post('/xinvite', xInvite.postUserInfo.bind(xInvite))
+    .get('/xinvite/:username', xInvite.getUserInfo.bind(xInvite))
 ;
 
 module.exports = router;
